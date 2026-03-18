@@ -1,0 +1,27 @@
+{{- if and .Values.monitoring.enabled .Values.app.enabled }}
+# Prometheus ServiceMonitor — scrapes the app's /metrics endpoint
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "tenant-app.appname" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+    app.kubernetes.io/component: monitoring
+    # Match prometheus ServiceMonitor selector (kube-prometheus-stack default)
+    release: orbit-monitoring
+spec:
+  selector:
+    matchLabels:
+      orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
+      app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.tenant.namespace }}
+  endpoints:
+    - port: {{ .Values.monitoring.serviceMonitor.port }}
+      path: {{ .Values.monitoring.serviceMonitor.path }}
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.monitoring.serviceMonitor.scrapeTimeout }}
+{{- end }}

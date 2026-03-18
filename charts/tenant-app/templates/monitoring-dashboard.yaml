@@ -1,0 +1,141 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.grafanaDashboard.enabled }}
+# Grafana Dashboard ConfigMap — provisioned by Grafana sidecar
+# Label grafana_dashboard=1 triggers the Grafana sidecar to auto-load this dashboard
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-{{ .Values.tenant.slug }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+    {{- range $k, $v := .Values.monitoring.grafanaDashboard.labels }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  annotations:
+    grafana_folder: "Tenants"
+data:
+  dashboard.json: |
+    {
+      "annotations": {"list": []},
+      "description": "Orbit tenant dashboard — {{ .Values.tenant.slug }}",
+      "editable": false,
+      "graphTooltip": 1,
+      "id": null,
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {"color": {"mode": "palette-classic"}, "unit": "short"}
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 1,
+          "options": {"tooltip": {"mode": "single"}},
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace=\"{{ .Values.tenant.namespace }}\"}[5m])) by (status_code)",
+              "legendFormat": "{{ "{{status_code}}" }}",
+              "refId": "A"
+            }
+          ],
+          "title": "HTTP Requests / sec",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {"color": {"mode": "thresholds"}, "unit": "percentunit",
+              "thresholds": {"mode": "absolute", "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.7},
+                {"color": "red", "value": 0.9}
+              ]}
+            }
+          },
+          "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+          "id": 2,
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto", "textMode": "auto"},
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"{{ .Values.tenant.namespace }}\", container!=\"\"}) / sum(kube_pod_container_resource_limits{namespace=\"{{ .Values.tenant.namespace }}\", resource=\"memory\"})",
+              "legendFormat": "Memory Usage",
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Utilization",
+          "type": "gauge"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {"color": {"mode": "thresholds"}, "unit": "percentunit",
+              "thresholds": {"mode": "absolute", "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.7},
+                {"color": "red", "value": 0.9}
+              ]}
+            }
+          },
+          "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+          "id": 3,
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto"},
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"{{ .Values.tenant.namespace }}\", container!=\"\"}[5m])) / sum(kube_pod_container_resource_limits{namespace=\"{{ .Values.tenant.namespace }}\", resource=\"cpu\"})",
+              "legendFormat": "CPU Usage",
+              "refId": "A"
+            }
+          ],
+          "title": "CPU Utilization",
+          "type": "gauge"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {"unit": "ms"}},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "id": 4,
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"{{ .Values.tenant.namespace }}\"}[5m])) by (le)) * 1000",
+              "legendFormat": "p95 latency",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"{{ .Values.tenant.namespace }}\"}[5m])) by (le)) * 1000",
+              "legendFormat": "p99 latency",
+              "refId": "B"
+            }
+          ],
+          "title": "HTTP Latency (p95 / p99)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {"unit": "short"}},
+          "gridPos": {"h": 6, "w": 12, "x": 12, "y": 8},
+          "id": 5,
+          "targets": [
+            {
+              "expr": "kube_deployment_status_replicas_available{namespace=\"{{ .Values.tenant.namespace }}\"}",
+              "legendFormat": "{{ "{{deployment}}" }} available",
+              "refId": "A"
+            },
+            {
+              "expr": "kube_deployment_spec_replicas{namespace=\"{{ .Values.tenant.namespace }}\"}",
+              "legendFormat": "{{ "{{deployment}}" }} desired",
+              "refId": "B"
+            }
+          ],
+          "title": "Replica Count",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 38,
+      "tags": ["orbit", "tenant", "{{ .Values.tenant.slug }}"],
+      "time": {"from": "now-1h", "to": "now"},
+      "title": "Orbit Tenant — {{ .Values.tenant.slug }}",
+      "uid": "orbit-tenant-{{ .Values.tenant.slug }}",
+      "version": 1
+    }
+{{- end }}

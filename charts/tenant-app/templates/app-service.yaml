@@ -1,0 +1,24 @@
+{{- if .Values.app.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tenant-app.appname" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+    app.kubernetes.io/component: app
+spec:
+  selector:
+    {{- include "tenant-app.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  type: ClusterIP
+{{- end }}

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: tenant-app
+description: Orbit per-tenant application stack — app, postgres, valkey, ingress, monitoring
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - orbit
+  - tenant
+  - devops
+home: https://github.com/lustresconsulting/orbit
+maintainers:
+  - name: sunnepah-bot
+    email: bot@lustres.dev

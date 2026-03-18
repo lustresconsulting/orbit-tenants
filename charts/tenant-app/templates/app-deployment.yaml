@@ -1,0 +1,67 @@
+{{- if .Values.app.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tenant-app.appname" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+    app.kubernetes.io/component: app
+  annotations:
+    {{- toYaml .Values.app.annotations | nindent 4 }}
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "tenant-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tenant-app.labels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+        app.kubernetes.io/component: app
+    spec:
+      serviceAccountName: orbit-agent
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          {{- if .Values.app.env }}
+          env:
+            {{- toYaml .Values.app.env | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.app.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.app.readinessProbe | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "tenant-app.selectorLabels" . | nindent 14 }}
+{{- end }}

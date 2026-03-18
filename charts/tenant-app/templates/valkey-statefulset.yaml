@@ -1,0 +1,131 @@
+{{- if .Values.valkey.enabled }}
+# Valkey StatefulSet — Redis-compatible, per-tenant
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "tenant-app.valkeyName" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+    app.kubernetes.io/component: valkey
+spec:
+  serviceName: {{ include "tenant-app.valkeyName" . }}-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
+      app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "tenant-app.labels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+        app.kubernetes.io/component: valkey
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: valkey
+          image: "{{ .Values.valkey.image.repository }}:{{ .Values.valkey.image.tag }}"
+          imagePullPolicy: {{ .Values.valkey.image.pullPolicy }}
+          command:
+            - valkey-server
+            - --requirepass
+            - $(VALKEY_PASSWORD)
+            - --save
+            - "60 1"
+            - --loglevel
+            - notice
+          ports:
+            - name: valkey
+              containerPort: 6379
+              protocol: TCP
+          env:
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.valkey.existingSecret }}
+                  key: {{ .Values.valkey.existingSecretKey }}
+          resources:
+            {{- toYaml .Values.valkey.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - valkey-cli -a $VALKEY_PASSWORD ping | grep PONG
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - valkey-cli -a $VALKEY_PASSWORD ping | grep PONG
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "tenant-app.labels" . | nindent 10 }}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.valkey.storage.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.valkey.storage.size }}
+---
+# Headless service for StatefulSet stable DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tenant-app.valkeyName" . }}-headless
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+    app.kubernetes.io/component: valkey
+spec:
+  clusterIP: None
+  selector:
+    orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
+    app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+  ports:
+    - name: valkey
+      port: 6379
+      targetPort: valkey
+---
+# ClusterIP service for app → valkey access
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tenant-app.valkeyName" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+    app.kubernetes.io/component: valkey
+spec:
+  selector:
+    orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
+    app.kubernetes.io/name: {{ include "tenant-app.valkeyName" . }}
+  ports:
+    - name: valkey
+      port: 6379
+      targetPort: valkey
+  type: ClusterIP
+{{- end }}

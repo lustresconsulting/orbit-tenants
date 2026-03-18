@@ -1,0 +1,16 @@
+{{- if and .Values.app.enabled .Values.app.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "tenant-app.appname" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
+    app.kubernetes.io/component: pdb
+spec:
+  minAvailable: {{ .Values.app.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "tenant-app.selectorLabels" . | nindent 6 }}
+{{- end }}

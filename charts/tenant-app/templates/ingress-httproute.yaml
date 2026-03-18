@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}
+{{- $hostname := .Values.ingress.hostname | default (printf "%s.orbit.lustres.dev" .Values.tenant.slug) }}
+# HTTPRoute — routes {slug}.orbit.lustres.dev to the tenant app service
+# Attaches to orbit-gateway in orbit-system via ReferenceGrant
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "tenant-app.fullname" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ $hostname }}
+spec:
+  parentRefs:
+    - name: {{ .Values.ingress.gatewayName }}
+      namespace: {{ .Values.ingress.gatewayNamespace }}
+      sectionName: websecure
+  hostnames:
+    - {{ $hostname | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ include "tenant-app.appname" . }}
+          port: 80
+{{- end }}

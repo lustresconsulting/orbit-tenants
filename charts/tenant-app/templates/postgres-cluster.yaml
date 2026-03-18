@@ -1,0 +1,50 @@
+{{- if .Values.postgres.enabled }}
+# CloudNativePG Cluster — one per tenant
+# Uses a pre-existing ExternalSecret (tenant-db-credentials) for the superuser password
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "tenant-app.postgresName" . }}
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    {{- include "tenant-app.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "tenant-app.postgresName" . }}
+    app.kubernetes.io/component: postgres
+spec:
+  instances: {{ .Values.postgres.instances }}
+  imageName: "ghcr.io/cloudnative-pg/postgresql:{{ .Values.postgres.version }}"
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "128MB"
+      effective_cache_size: "384MB"
+      maintenance_work_mem: "32MB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "4MB"
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      work_mem: "2MB"
+  bootstrap:
+    initdb:
+      database: {{ .Values.postgres.database }}
+      owner: {{ .Values.postgres.postgresUser }}
+      secret:
+        name: {{ .Values.postgres.existingSecret }}
+  storage:
+    size: {{ .Values.postgres.storage.size }}
+    storageClass: {{ .Values.postgres.storage.storageClass }}
+  superuserSecret:
+    name: {{ .Values.postgres.existingSecret }}
+  # Backup to Hetzner Object Storage (uses platform-level backup config)
+  # backup: disabled for starter plan; enabled for growth/scale
+  monitoring:
+    enablePodMonitor: {{ .Values.monitoring.enabled }}
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+{{- end }}
