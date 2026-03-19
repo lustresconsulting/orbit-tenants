@@ -8,14 +8,27 @@ tenant:
   plan: starter     # starter | growth | scale
 
 # --- App (Deployment + Service + HPA + PDB) ---
+# Values can be overridden by tenant's analysis results via Helm --set
 app:
   enabled: true
   image:
-    repository: nginx          # Overridden by tenant's CI pipeline
-    tag: alpine
+    repository: nginx          # Overridden by tenant's CI pipeline or analysis
+    tag: alpine                # Overridden with image SHA from GitHub Actions
     pullPolicy: IfNotPresent
-  replicaCount: 1
-  port: 8080
+  replicaCount: 2
+  port: 8080                  # May be overridden per-language (Node: 3000, Python: 8000, Go: 8080)
+  
+  # Environment: detected from analysis_result.language
+  # Languages detected: go, node, python, ruby, java, rust
+  # Startup commands inferred per-language:
+  #   - node: npm start
+  #   - python: python main.py (or uvicorn via Dockerfile)
+  #   - go: ./app (or detected from go.mod)
+  #   - ruby: bundle exec rails server
+  #   - java: java -jar app.jar
+  command: []               # Override per-language (from analysis)
+  args: []
+  
   env: []
   # env:
   #   - name: DATABASE_URL
@@ -23,34 +36,55 @@ app:
   #       secretKeyRef:
   #         name: tenant-db-credentials
   #         key: url
+  
+  # Resources: populated from analysis_result.resources
+  # Example (Python/Node):
+  #   - cpu_request: 200m, memory_request: 256Mi, cpu_limit: 1000m, memory_limit: 1Gi
+  # Example (Go):
+  #   - cpu_request: 100m, memory_request: 128Mi, cpu_limit: 500m, memory_limit: 512Mi
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 200m               # Overridden from analysis
+      memory: 256Mi           # Overridden from analysis
     limits:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 1000m              # Overridden from analysis
+      memory: 1Gi             # Overridden from analysis
+  
   hpa:
     enabled: true
-    minReplicas: 1
+    minReplicas: 2
     maxReplicas: 10
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
+  
   pdb:
     enabled: true
     minAvailable: 1
+  
+  # Health check paths: detected from analysis_result.framework
+  # Examples:
+  #   - FastAPI: /docs or /health
+  #   - Django: /admin or /health
+  #   - Express: /health (user-provided)
+  #   - Go stdlib: /health (user-provided)
   livenessProbe:
     httpGet:
-      path: /health
-      port: 8080
+      path: /health          # May be overridden per-framework
+      port: 8080             # May be overridden per-language
     initialDelaySeconds: 15
     periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
   readinessProbe:
     httpGet:
-      path: /ready
-      port: 8080
+      path: /ready           # May be overridden per-framework
+      port: 8080             # May be overridden per-language
     initialDelaySeconds: 5
     periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 2
+  
   annotations: {}
   labels: {}
 
