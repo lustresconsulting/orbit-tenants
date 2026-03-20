@@ -85,6 +85,7 @@ app:
     timeoutSeconds: 3
     failureThreshold: 2
   
+  readOnlyRootFilesystem: false   # Most apps need writable root; set true for hardened images
   annotations: {}
   labels: {}
 
