@@ -22,7 +22,8 @@ spec:
         app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
         app.kubernetes.io/component: app
     spec:
-      serviceAccountName: orbit-agent
+      serviceAccountName: default
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

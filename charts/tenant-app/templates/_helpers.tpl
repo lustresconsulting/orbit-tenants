@@ -3,10 +3,21 @@ Common helpers for tenant-app chart.
 */}}
 
 {{/*
-Full name: tenant-{slug}
+Resource prefix: uses tenant.resourcePrefix if set (obfuscated), otherwise tenant-{slug}.
+*/}}
+{{- define "tenant-app.resourcePrefix" -}}
+{{- if .Values.tenant.resourcePrefix -}}
+{{- .Values.tenant.resourcePrefix | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+{{- printf "tenant-%s" .Values.tenant.slug | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Full name: resource prefix (e.g. t-a7f3b2c1 or tenant-{slug})
 */}}
 {{- define "tenant-app.fullname" -}}
-{{- printf "tenant-%s" .Values.tenant.slug | trunc 63 | trimSuffix "-" }}
+{{- include "tenant-app.resourcePrefix" . }}
 {{- end }}
 
 {{/*
@@ -39,12 +50,12 @@ app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
 Postgres cluster name
 */}}
 {{- define "tenant-app.postgresName" -}}
-{{- printf "tenant-%s-pg" .Values.tenant.slug | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-pg" (include "tenant-app.resourcePrefix" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Valkey name
 */}}
 {{- define "tenant-app.valkeyName" -}}
-{{- printf "tenant-%s-valkey" .Values.tenant.slug | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-valkey" (include "tenant-app.resourcePrefix" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
