@@ -13,7 +13,7 @@ app:
     tag: main-a6922e5
     pullPolicy: IfNotPresent
   replicaCount: 2
-  port: 8000
+  port: 5000
   env:
     - name: DATABASE_URL
       value: "postgresql://postgres@tenant-sunnepah-oktradesystem-pg-rw:5432/app"
@@ -38,13 +38,13 @@ app:
   livenessProbe:
     httpGet:
       path: /health
-      port: 8000
+      port: 5000
     initialDelaySeconds: 15
     periodSeconds: 30
   readinessProbe:
     httpGet:
       path: /health
-      port: 8000
+      port: 5000
     initialDelaySeconds: 10
     periodSeconds: 10
 
