@@ -45,6 +45,12 @@ spec:
           env:
             {{- toYaml .Values.app.env | nindent 12 }}
           {{- end }}
+          {{- if .Values.secrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: tenant-app-secrets
+                optional: true
+          {{- end }}
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
           livenessProbe:

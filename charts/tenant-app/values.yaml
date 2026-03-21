@@ -132,6 +132,10 @@ ingress:
   gatewayNamespace: orbit-system
   tls: true
 
+# --- Secrets (ExternalSecret via infisical-orbit-tenants ClusterSecretStore) ---
+secrets:
+  enabled: true
+
 # --- Monitoring (ServiceMonitor + Grafana Dashboard) ---
 monitoring:
   enabled: true
