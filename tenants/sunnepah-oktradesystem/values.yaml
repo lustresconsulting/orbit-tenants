@@ -55,4 +55,4 @@ monitoring:
   enabled: false
 
 secrets:
-  enabled: false
+  enabled: true
