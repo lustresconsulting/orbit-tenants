@@ -10,7 +10,7 @@ app:
   enabled: true
   image:
     repository: ghcr.io/sunnepah/oktradesystem-backend
-    tag: main-ccb936a
+    tag: main-dc27324
     pullPolicy: Always
   replicaCount: 1
   port: 5000
