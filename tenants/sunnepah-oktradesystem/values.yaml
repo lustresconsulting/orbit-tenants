@@ -9,18 +9,23 @@ tenant:
 app:
   enabled: true
   image:
-    repository: nginx
-    tag: alpine
+    repository: ghcr.io/sunnepah/oktradesystem/backend
+    tag: a6922e503ef9
     pullPolicy: IfNotPresent
-  replicaCount: 1
-  port: 80
+  replicaCount: 2
+  port: 8000
+  env:
+    - name: DATABASE_URL
+      value: "postgresql://postgres@tenant-sunnepah-oktradesystem-pg-rw:5432/app"
+    - name: REDIS_URL
+      value: "redis://tenant-sunnepah-oktradesystem-valkey:6379/0"
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
       cpu: 500m
       memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
   hpa:
     enabled: true
     minReplicas: 1
@@ -32,15 +37,15 @@ app:
     minAvailable: 1
   livenessProbe:
     httpGet:
-      path: /
-      port: 80
+      path: /health
+      port: 8000
     initialDelaySeconds: 15
-    periodSeconds: 20
+    periodSeconds: 30
   readinessProbe:
     httpGet:
-      path: /
-      port: 80
-    initialDelaySeconds: 5
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
     periodSeconds: 10
 
 postgres:
