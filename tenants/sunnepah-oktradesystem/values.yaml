@@ -15,10 +15,6 @@ app:
   replicaCount: 1
   port: 5000
   env:
-    - name: DATABASE_URL
-      value: "postgresql://postgres@tenant-sunnepah-oktradesystem-pg-rw:5432/app"
-    - name: REDIS_URL
-      value: "redis://tenant-sunnepah-oktradesystem-valkey:6379/0"
     - name: FLASK_ENV
       value: production
     - name: PORT
