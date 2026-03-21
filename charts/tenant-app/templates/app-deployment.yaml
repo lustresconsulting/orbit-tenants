@@ -21,6 +21,7 @@ spec:
         {{- include "tenant-app.labels" . | nindent 8 }}
         app.kubernetes.io/name: {{ include "tenant-app.appname" . }}
         app.kubernetes.io/component: app
+        orbit.sh/component: app
     spec:
       serviceAccountName: default
       automountServiceAccountToken: false
