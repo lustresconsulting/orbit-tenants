@@ -1,0 +1,50 @@
+# NetworkPolicy — tenant isolation
+# Restricts inbound traffic to tenant pods; only allows from orbit-system gateway and within namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: orbit-tenant-isolation
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ .Values.tenant.slug }}
+    orbit.sh/managed-by: orbit-operator
+spec:
+  # Select ALL tenant pods by tenant label (covers backend, frontend, worker)
+  podSelector:
+    matchLabels:
+      orbit.sh/tenant: {{ .Values.tenant.slug }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow inbound from orbit-system namespace (gateway)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: orbit-system
+    # Allow inbound from within the same tenant namespace
+    - from:
+        - podSelector: {}
+  egress:
+    # Allow DNS
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow outbound to the same tenant namespace (postgres, valkey, inter-component)
+    - to:
+        - podSelector: {}
+    # Allow outbound to kube-system (CoreDNS, etc.)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+    # Allow outbound to internet (for external APIs)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16

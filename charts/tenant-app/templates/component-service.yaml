@@ -1,0 +1,20 @@
+{{- range $name, $comp := .Values.components }}
+{{- if and $comp.enabled (ne $comp.type "worker") (ne ($comp.port | int) 0) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.tenant.slug }}-{{ $name }}
+  namespace: {{ $.Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ $.Values.tenant.slug }}
+    orbit.sh/component: {{ $comp.type }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}
+  ports:
+    - port: {{ $comp.port }}
+      targetPort: {{ $comp.port }}
+      protocol: TCP
+---
+{{- end }}
+{{- end }}

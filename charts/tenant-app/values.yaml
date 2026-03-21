@@ -7,87 +7,10 @@ tenant:
   namespace: ""     # Required: e.g. "tenant-acme-corp-prod"
   plan: starter     # starter | growth | scale
 
-# --- App (Deployment + Service + HPA + PDB) ---
-# Values can be overridden by tenant's analysis results via Helm --set
-app:
-  enabled: true
-  image:
-    repository: nginx          # Overridden by tenant's CI pipeline or analysis
-    tag: alpine                # Overridden with image SHA from GitHub Actions
-    pullPolicy: IfNotPresent
-  replicaCount: 2
-  port: 8080                  # May be overridden per-language (Node: 3000, Python: 8000, Go: 8080)
-  
-  # Environment: detected from analysis_result.language
-  # Languages detected: go, node, python, ruby, java, rust
-  # Startup commands inferred per-language:
-  #   - node: npm start
-  #   - python: python main.py (or uvicorn via Dockerfile)
-  #   - go: ./app (or detected from go.mod)
-  #   - ruby: bundle exec rails server
-  #   - java: java -jar app.jar
-  command: []               # Override per-language (from analysis)
-  args: []
-  
-  env: []
-  # env:
-  #   - name: DATABASE_URL
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: tenant-db-credentials
-  #         key: url
-  
-  # Resources: populated from analysis_result.resources
-  # Example (Python/Node):
-  #   - cpu_request: 200m, memory_request: 256Mi, cpu_limit: 1000m, memory_limit: 1Gi
-  # Example (Go):
-  #   - cpu_request: 100m, memory_request: 128Mi, cpu_limit: 500m, memory_limit: 512Mi
-  resources:
-    requests:
-      cpu: 200m               # Overridden from analysis
-      memory: 256Mi           # Overridden from analysis
-    limits:
-      cpu: 1000m              # Overridden from analysis
-      memory: 1Gi             # Overridden from analysis
-  
-  hpa:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 70
-    targetMemoryUtilizationPercentage: 80
-  
-  pdb:
-    enabled: true
-    minAvailable: 1
-  
-  # Health check paths: detected from analysis_result.framework
-  # Examples:
-  #   - FastAPI: /docs or /health
-  #   - Django: /admin or /health
-  #   - Express: /health (user-provided)
-  #   - Go stdlib: /health (user-provided)
-  livenessProbe:
-    httpGet:
-      path: /health          # May be overridden per-framework
-      port: 8080             # May be overridden per-language
-    initialDelaySeconds: 15
-    periodSeconds: 20
-    timeoutSeconds: 5
-    failureThreshold: 3
-  
-  readinessProbe:
-    httpGet:
-      path: /ready           # May be overridden per-framework
-      port: 8080             # May be overridden per-language
-    initialDelaySeconds: 5
-    periodSeconds: 10
-    timeoutSeconds: 3
-    failureThreshold: 2
-  
-  readOnlyRootFilesystem: false   # Most apps need writable root; set true for hardened images
-  annotations: {}
-  labels: {}
+# --- Components (Deployment + Service + HTTPRoute per component) ---
+# Each key is a component name (backend, frontend, worker, etc.)
+# Each component gets its own Deployment; non-worker components also get a Service + HTTPRoute.
+components: {}
 
 # --- PostgreSQL (CloudNativePG Cluster) ---
 postgres:
@@ -96,7 +19,6 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  # Password stored in secret managed by ExternalSecret
   existingSecret: tenant-db-credentials
   existingSecretKey: password
   postgresUser: tenant
@@ -113,7 +35,6 @@ valkey:
   storage:
     size: 1Gi
     storageClass: local-path
-  password: ""            # Set via existingSecret
   existingSecret: tenant-valkey-credentials
   existingSecretKey: password
   resources:
@@ -124,26 +45,18 @@ valkey:
       cpu: 200m
       memory: 256Mi
 
-# --- Ingress (HTTPRoute via Gateway API) ---
-ingress:
-  enabled: true
-  hostname: ""            # Defaults to {slug}.orbit.lustres.dev
-  gatewayName: orbit-gateway
-  gatewayNamespace: orbit-system
-  tls: true
-
 # --- Secrets (ExternalSecret via infisical-orbit-tenants ClusterSecretStore) ---
 secrets:
   enabled: true
 
 # --- Monitoring (ServiceMonitor + Grafana Dashboard) ---
 monitoring:
-  enabled: true
+  enabled: false
   serviceMonitor:
     interval: 30s
     scrapeTimeout: 10s
     path: /metrics
-    port: metrics           # Named port on the app Service
+    port: metrics
   grafanaDashboard:
     enabled: true
     labels:

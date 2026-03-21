@@ -1,0 +1,82 @@
+{{- range $name, $comp := .Values.components }}
+{{- if $comp.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.tenant.slug }}-{{ $name }}
+  namespace: {{ $.Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ $.Values.tenant.slug }}
+    orbit.sh/component: {{ $comp.type }}
+    app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}
+spec:
+  replicas: {{ $comp.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}
+  template:
+    metadata:
+      labels:
+        orbit.sh/tenant: {{ $.Values.tenant.slug }}
+        orbit.sh/component: {{ $comp.type }}
+        app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: {{ $name }}
+          image: {{ $comp.image.repository }}:{{ $comp.image.tag }}
+          imagePullPolicy: {{ $comp.image.pullPolicy | default "Always" }}
+          {{- if $comp.command }}
+          command: {{ $comp.command | toJson }}
+          {{- end }}
+          {{- if ne ($comp.port | int) 0 }}
+          ports:
+            - containerPort: {{ $comp.port }}
+          {{- end }}
+          {{- if $comp.env }}
+          env:
+            {{- toYaml $comp.env | nindent 12 }}
+          {{- end }}
+          {{- if $.Values.secrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: tenant-app-secrets
+                optional: true
+          {{- end }}
+          resources:
+            {{- toYaml $comp.resources | nindent 12 }}
+          {{- if and $comp.livenessProbe (ne $comp.type "worker") }}
+          livenessProbe:
+            {{- toYaml $comp.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if and $comp.readinessProbe (ne $comp.type "worker") }}
+          readinessProbe:
+            {{- toYaml $comp.readinessProbe | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}
+---
+{{- end }}
+{{- end }}
