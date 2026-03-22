@@ -1,0 +1,51 @@
+{{- if and .Values.customDomain.enabled (ne .Values.customDomain.hostname "") }}
+{{- $hostname := .Values.customDomain.hostname }}
+{{- $slug := .Values.tenant.slug }}
+---
+# Certificate for the custom domain — cert-manager HTTP-01 challenge
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $slug }}-custom-domain
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ $slug }}
+spec:
+  secretName: {{ $slug }}-custom-domain-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ $hostname | quote }}
+---
+# HTTPRoute for the custom domain — routes to the first non-worker component's service
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $slug }}-custom-domain
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ $slug }}
+    orbit.sh/custom-domain: "true"
+spec:
+  parentRefs:
+    - name: orbit-gateway
+      namespace: orbit-system
+      sectionName: websecure
+  hostnames:
+    - {{ $hostname | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        {{- $found := false }}
+        {{- range $name, $comp := .Values.components }}
+        {{- if and (not $found) $comp.enabled (ne $comp.type "worker") (ne ($comp.port | int) 0) }}
+        - name: {{ $slug }}-{{ $name }}
+          port: {{ $comp.port }}
+        {{- $found = true }}
+        {{- end }}
+        {{- end }}
+{{- end }}

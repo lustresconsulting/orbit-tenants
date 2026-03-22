@@ -7,6 +7,13 @@ tenant:
   namespace: ""     # Required: e.g. "tenant-acme-corp-prod"
   plan: starter     # starter | growth | scale
 
+# --- Custom domain (optional) ---
+# When enabled, creates an additional HTTPRoute + Certificate for the custom domain.
+# Tenant must point a CNAME from their domain to {slug}.orbit.lustres.dev.
+customDomain:
+  enabled: false
+  hostname: ""
+
 # --- Components (Deployment + Service + HTTPRoute per component) ---
 # Each key is a component name (backend, frontend, worker, etc.)
 # Each component gets its own Deployment; non-worker components also get a Service + HTTPRoute.
