@@ -1,0 +1,67 @@
+{{- range $name, $comp := .Values.components }}
+{{- if and $comp.enabled $comp.migrationCommand }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Values.tenant.slug }}-{{ $name }}-migrate-{{ $comp.image.tag | trunc 8 }}
+  namespace: {{ $.Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ $.Values.tenant.slug }}
+    orbit.sh/component: {{ $comp.type }}
+    app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        orbit.sh/tenant: {{ $.Values.tenant.slug }}
+        orbit.sh/component: {{ $comp.type }}
+        app.kubernetes.io/name: {{ $.Values.tenant.slug }}-{{ $name }}-migrate
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: migrate
+          image: {{ $comp.image.repository }}:{{ $comp.image.tag }}
+          imagePullPolicy: {{ $comp.image.pullPolicy | default "Always" }}
+          command:
+            - sh
+            - -c
+            - {{ $comp.migrationCommand | quote }}
+          {{- if $.Values.secrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: tenant-app-secrets
+                optional: true
+          {{- end }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+---
+{{- end }}
+{{- end }}

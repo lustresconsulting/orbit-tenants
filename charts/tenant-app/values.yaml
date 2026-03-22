@@ -14,6 +14,12 @@ customDomain:
   enabled: false
   hostname: ""
 
+# --- Database mode ---
+# "orbit" = CNPG PostgreSQL provisioned in-namespace (default)
+# "external" = user-provided connection string (Supabase, Neon, etc.)
+database:
+  mode: orbit
+
 # --- Components (Deployment + Service + HTTPRoute per component) ---
 # Each key is a component name (backend, frontend, worker, etc.)
 # Each component gets its own Deployment; non-worker components also get a Service + HTTPRoute.

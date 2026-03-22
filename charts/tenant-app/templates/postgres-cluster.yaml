@@ -1,4 +1,4 @@
-{{- if .Values.postgres.enabled }}
+{{- if and .Values.postgres.enabled (eq .Values.database.mode "orbit") }}
 # CloudNativePG Cluster — one per tenant
 # Uses a pre-existing ExternalSecret (tenant-db-credentials) for the superuser password
 apiVersion: postgresql.cnpg.io/v1
