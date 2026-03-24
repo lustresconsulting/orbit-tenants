@@ -1,6 +1,6 @@
 tenant:
   slug: oktradesystem-3262ccd1
-  namespace: tenant-oktradesystem-3262ccd1-prod
+  namespace: t-oktradesystem-3262ccd1-prod
   plan: starter
 components:
   frontend:
