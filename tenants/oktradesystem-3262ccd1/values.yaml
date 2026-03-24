@@ -3,11 +3,11 @@ tenant:
   namespace: t-oktradesystem-3262ccd1-prod
   plan: starter
 components:
-  frontend:
+  backend:
     enabled: true
-    type: frontend
+    type: backend
     image:
-      repository: ghcr.io/sunnepah/oktradesystem-frontend
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-78bb06a
       pullPolicy: Always
     port: 8000
@@ -32,6 +32,38 @@ components:
       httpGet:
         path: /
         port: 8000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      failureThreshold: 3
+  frontend:
+    enabled: true
+    type: frontend
+    image:
+      repository: ghcr.io/sunnepah/oktradesystem-frontend
+      tag: main-78bb06a
+      pullPolicy: Always
+    port: 3000
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+    env: []
+    command: []
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 3000
       initialDelaySeconds: 15
       periodSeconds: 10
       failureThreshold: 3
