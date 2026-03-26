@@ -8,7 +8,7 @@ components:
     type: backend
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: main-d2d2171
+      tag: main-28b08fc
       pullPolicy: Always
     port: 5000
     replicaCount: 1
@@ -38,10 +38,9 @@ components:
   worker:
     enabled: true
     type: worker
-    # Worker uses same image as backend — no separate worker image exists
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: main-d2d2171
+      tag: main-28b08fc
       pullPolicy: Always
     port: 0
     replicaCount: 1
@@ -53,9 +52,12 @@ components:
         cpu: 1000m
         memory: 1Gi
     env: []
-    # Celery app lives at src/celery_app.py → module: src.celery_app
-    command: ["celery", "-A", "src.celery_app", "worker", "--loglevel=info"]
-    # No HTTP probes — Helm chart skips probes for type: worker
+    command:
+    - celery
+    - -A
+    - src.celery_app
+    - worker
+    - --loglevel=info
   frontend:
     enabled: true
     type: frontend
