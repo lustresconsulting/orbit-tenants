@@ -34,13 +34,13 @@ spec:
           image: "{{ .Values.valkey.image.repository }}:{{ .Values.valkey.image.tag }}"
           imagePullPolicy: {{ .Values.valkey.image.pullPolicy }}
           command:
-            - valkey-server
-            - --requirepass
-            - $(VALKEY_PASSWORD)
-            - --save
-            - "60 1"
-            - --loglevel
-            - notice
+            - sh
+            - -c
+            - |
+              exec valkey-server \
+                --requirepass "$VALKEY_PASSWORD" \
+                --save "60 1" \
+                --loglevel notice
           ports:
             - name: valkey
               containerPort: 6379
