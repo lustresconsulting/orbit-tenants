@@ -8,7 +8,7 @@ components:
     type: backend
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: main-28b08fc
+      tag: main-d2d2171
       pullPolicy: Always
     port: 5000
     replicaCount: 1
@@ -40,7 +40,7 @@ components:
     type: worker
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: main-28b08fc
+      tag: main-d2d2171
       pullPolicy: Always
     port: 0
     replicaCount: 1
