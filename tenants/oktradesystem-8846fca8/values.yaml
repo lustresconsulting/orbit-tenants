@@ -38,35 +38,23 @@ components:
   worker:
     enabled: true
     type: worker
+    # Worker uses the same image as backend — no separate worker image exists
     image:
-      repository: ghcr.io/sunnepah/oktradesystem-worker
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-d2d2171
       pullPolicy: Always
-    port: 8000
+    port: 0
     replicaCount: 1
     resources:
       requests:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 250m
+        memory: 256Mi
       limits:
-        cpu: 2000m
-        memory: 2Gi
+        cpu: 1000m
+        memory: 1Gi
     env: []
-    command: []
-    livenessProbe:
-      httpGet:
-        path: /
-        port: 8000
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      failureThreshold: 3
-    readinessProbe:
-      httpGet:
-        path: /
-        port: 8000
-      initialDelaySeconds: 15
-      periodSeconds: 10
-      failureThreshold: 3
+    command: ["celery", "-A", "app.celery_app", "worker", "--loglevel=info"]
+    # No HTTP probes for workers — Helm chart skips probes for type: worker
   frontend:
     enabled: true
     type: frontend
