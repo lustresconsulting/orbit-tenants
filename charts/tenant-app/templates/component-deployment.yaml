@@ -65,9 +65,27 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            {{- if eq $comp.type "frontend" }}
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+            {{- end }}
+            {{- if $comp.extraVolumeMounts }}
+            {{- toYaml $comp.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}
+        {{- if eq $comp.type "frontend" }}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        {{- end }}
+        {{- if $comp.extraVolumes }}
+        {{- toYaml $comp.extraVolumes | nindent 8 }}
+        {{- end }}
       imagePullSecrets:
         - name: ghcr-pull-secret
       topologySpreadConstraints:
