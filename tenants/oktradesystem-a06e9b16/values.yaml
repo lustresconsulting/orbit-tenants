@@ -67,7 +67,7 @@ components:
       initialDelaySeconds: 15
       periodSeconds: 10
       failureThreshold: 3
-  celery_worker:
+  celery-worker:
     enabled: true
     type: worker
     image:
@@ -85,7 +85,7 @@ components:
         memory: 2Gi
     env: []
     command: ["celery", "-A", "src.celery_app", "worker", "--loglevel=debug", "--queues=price_updates,historical_updates"]
-  celery_beat:
+  celery-beat:
     enabled: true
     type: worker
     image:
