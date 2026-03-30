@@ -44,7 +44,7 @@ spec:
           {{- if $.Values.secrets.enabled }}
           envFrom:
             - secretRef:
-                name: tenant-app-secrets
+                name: tenant-secrets-{{ $name }}
                 optional: true
           {{- end }}
           resources:
