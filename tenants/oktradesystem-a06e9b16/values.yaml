@@ -84,7 +84,7 @@ components:
         cpu: 2000m
         memory: 2Gi
     env: []
-    command: []
+    command: "celery -A src.celery_app worker --loglevel=debug --queues=price_updates,historical_updates"
   celery_beat:
     enabled: true
     type: worker
@@ -102,7 +102,7 @@ components:
         cpu: 2000m
         memory: 2Gi
     env: []
-    command: []
+    command: "celery -A src.celery_app beat --loglevel=debug"
 postgres:
   enabled: true
 valkey:
