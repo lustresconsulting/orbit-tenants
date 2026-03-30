@@ -8,7 +8,7 @@ components:
     type: backend
     image:
       repository: ghcr.io/sunnepah/oktradesystem
-      tag: main-8709d8c
+      tag: main-646a82b
       pullPolicy: Always
     port: 5000
     replicaCount: 1
@@ -84,7 +84,13 @@ components:
         cpu: 2000m
         memory: 2Gi
     env: []
-    command: ["celery", "-A", "src.celery_app", "worker", "--loglevel=debug", "--queues=price_updates,historical_updates"]
+    command:
+    - celery
+    - -A
+    - src.celery_app
+    - worker
+    - --loglevel=debug
+    - --queues=price_updates,historical_updates
   celery-beat:
     enabled: true
     type: worker
@@ -102,7 +108,12 @@ components:
         cpu: 2000m
         memory: 2Gi
     env: []
-    command: ["celery", "-A", "src.celery_app", "beat", "--loglevel=debug"]
+    command:
+    - celery
+    - -A
+    - src.celery_app
+    - beat
+    - --loglevel=debug
 postgres:
   enabled: true
 valkey:
