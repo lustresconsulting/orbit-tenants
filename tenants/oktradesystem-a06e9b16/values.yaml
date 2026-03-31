@@ -7,7 +7,7 @@ components:
     enabled: true
     type: backend
     image:
-      repository: ghcr.io/sunnepah/oktradesystem
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-88d3d06
       pullPolicy: Always
     port: 5000
@@ -71,7 +71,7 @@ components:
     enabled: true
     type: worker
     image:
-      repository: ghcr.io/sunnepah/oktradesystem
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-8709d8c
       pullPolicy: Always
     port: 8000
@@ -95,7 +95,7 @@ components:
     enabled: true
     type: worker
     image:
-      repository: ghcr.io/sunnepah/oktradesystem
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-8709d8c
       pullPolicy: Always
     port: 8000
