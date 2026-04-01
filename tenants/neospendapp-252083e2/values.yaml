@@ -7,7 +7,7 @@ components:
     enabled: true
     type: backend
     image:
-      repository: ghcr.io/neospendappteam/neospendapp
+      repository: ghcr.io/neospendappteam/neospendapp-backend
       tag: main-884cb5a
       pullPolicy: Always
     port: 8000
@@ -44,7 +44,7 @@ components:
     enabled: true
     type: worker
     image:
-      repository: ghcr.io/neospendappteam/neospendapp
+      repository: ghcr.io/neospendappteam/neospendapp-celery-worker
       tag: main-884cb5a
       pullPolicy: Always
     port: 8000
@@ -67,7 +67,7 @@ components:
     enabled: true
     type: worker
     image:
-      repository: ghcr.io/neospendappteam/neospendapp
+      repository: ghcr.io/neospendappteam/neospendapp-celery-beat
       tag: main-884cb5a
       pullPolicy: Always
     port: 8000
@@ -102,5 +102,5 @@ migration:
   - migrate
   - --noinput
   image:
-    repository: ghcr.io/neospendappteam/neospendapp
+    repository: ghcr.io/neospendappteam/neospendapp-backend
     tag: main-884cb5a
