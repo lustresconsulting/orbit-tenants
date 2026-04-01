@@ -45,7 +45,7 @@ components:
     type: frontend
     image:
       repository: ghcr.io/sunnepah/oktradesystem-frontend
-      tag: main-88d3d06
+      tag: main-48db24d
       pullPolicy: Always
     port: 3000
     replicaCount: 1
