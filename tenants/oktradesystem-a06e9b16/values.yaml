@@ -19,7 +19,15 @@ components:
       limits:
         cpu: 2000m
         memory: 2Gi
-    env: []
+    env:
+      - name: VITE_API_URL
+        value: "http://oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local/api"
+      - name: VITE_WEBSOCKET_URL
+        value: "ws://oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local"
+      - name: NODE_ENV
+        value: production
+      - name: VITE_APP_TITLE
+        value: "Trading System Production"
     command: []
     secrets:
       - key: DATABASE_URL
