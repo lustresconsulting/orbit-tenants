@@ -8,7 +8,7 @@ components:
     type: backend
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: main-88d3d06
+      tag: main-48db24d
       pullPolicy: Always
     port: 5000
     replicaCount: 1
@@ -22,10 +22,10 @@ components:
     env: []
     command: []
     secrets:
-      - key: DATABASE_URL
-      - key: REDIS_URL
-      - key: CACHE_URL
-        remoteKey: REDIS_URL
+    - key: DATABASE_URL
+    - key: REDIS_URL
+    - key: CACHE_URL
+      remoteKey: REDIS_URL
     livenessProbe:
       httpGet:
         path: /
@@ -57,14 +57,14 @@ components:
         cpu: 2000m
         memory: 2Gi
     env:
-      - name: VITE_API_URL
-        value: "http://api-oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local/api"
-      - name: VITE_WEBSOCKET_URL
-        value: "ws://api-oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local"
-      - name: NODE_ENV
-        value: production
-      - name: VITE_APP_TITLE
-        value: "Trading System Production"
+    - name: VITE_API_URL
+      value: http://api-oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local/api
+    - name: VITE_WEBSOCKET_URL
+      value: ws://api-oktradesystem-a06e9b16-backend.t-oktradesystem-a06e9b16-prod.svc.cluster.local
+    - name: NODE_ENV
+      value: production
+    - name: VITE_APP_TITLE
+      value: Trading System Production
     command: []
     secrets: []
     livenessProbe:
@@ -106,10 +106,10 @@ components:
     - --loglevel=debug
     - --queues=price_updates,historical_updates
     secrets:
-      - key: DATABASE_URL
-      - key: REDIS_URL
-      - key: CACHE_URL
-        remoteKey: REDIS_URL
+    - key: DATABASE_URL
+    - key: REDIS_URL
+    - key: CACHE_URL
+      remoteKey: REDIS_URL
   celery-beat:
     enabled: true
     type: worker
@@ -134,10 +134,10 @@ components:
     - beat
     - --loglevel=debug
     secrets:
-      - key: DATABASE_URL
-      - key: REDIS_URL
-      - key: CACHE_URL
-        remoteKey: REDIS_URL
+    - key: DATABASE_URL
+    - key: REDIS_URL
+    - key: CACHE_URL
+      remoteKey: REDIS_URL
 postgres:
   enabled: true
 valkey:
