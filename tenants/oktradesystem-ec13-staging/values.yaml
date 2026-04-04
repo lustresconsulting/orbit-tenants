@@ -11,7 +11,7 @@ components:
     type: backend
     image:
       repository: nginx
-      tag: alpine
+      tag: main-2628e42
       pullPolicy: IfNotPresent
     port: 80
     replicaCount: 1
