@@ -103,6 +103,38 @@ components:
       initialDelaySeconds: 15
       periodSeconds: 10
       failureThreshold: 3
+  celery-beat:
+    enabled: true
+    type: celery-beat
+    image:
+      repository: ghcr.io/sunnepah/oktradesystem-celery-beat
+      tag: main-2628e42
+      pullPolicy: Always
+    port: 3000
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+    env: []
+    command: []
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 3000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      failureThreshold: 3
 hpa:
   enabled: true
   minReplicas: 1
