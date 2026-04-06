@@ -5,7 +5,7 @@ components:
     - secretRef:
         name: backend-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -42,7 +42,7 @@ components:
     - secretRef:
         name: celery-beat-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -76,7 +76,7 @@ components:
     - secretRef:
         name: celery-worker-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -104,7 +104,7 @@ components:
     - secretRef:
         name: frontend-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-frontend
       tag: latest
     port: 3000
     replicas: 1
@@ -117,7 +117,7 @@ components:
         memory: 128Mi
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: orbit
 hpa:
@@ -137,7 +137,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
@@ -156,7 +156,7 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  version: "17"
+  version: '17'
 tenant:
   namespace: t-oktradesystem-647e-staging
   plan: starter
