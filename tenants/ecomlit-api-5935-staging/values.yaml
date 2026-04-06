@@ -7,7 +7,7 @@ components:
         name: merchant-service-env
     image:
       repository: ghcr.io/ecomlit/org-api-merchant-service
-      tag: main-905010e
+      tag: main-cbe6104
     livenessProbe:
       failureThreshold: 3
       httpGet:
