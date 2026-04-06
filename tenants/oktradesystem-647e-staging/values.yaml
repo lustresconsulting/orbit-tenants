@@ -1,6 +1,7 @@
 components:
   backend:
     enabled: true
+    type: backend
     envFrom:
     - secretRef:
         name: backend-env
@@ -31,6 +32,7 @@ components:
         cpu: 100m
         memory: 128Mi
   celery-beat:
+    type: worker
     command:
     - celery
     - -A
@@ -65,6 +67,7 @@ components:
         cpu: 100m
         memory: 128Mi
   celery-worker:
+    type: worker
     command:
     - celery
     - -A
@@ -100,6 +103,7 @@ components:
         memory: 128Mi
   frontend:
     enabled: true
+    type: frontend
     envFrom:
     - secretRef:
         name: frontend-env

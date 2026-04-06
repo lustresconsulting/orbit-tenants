@@ -1,6 +1,7 @@
 components:
   merchant-service:
     enabled: true
+    type: backend
     envFrom:
     - secretRef:
         name: merchant-service-env
