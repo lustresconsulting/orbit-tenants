@@ -5,8 +5,8 @@ components:
     - secretRef:
         name: merchant-service-env
     image:
-      repository: ""
-      tag: latest
+      repository: ghcr.io/ecomlit/org-api-merchant-service
+      tag: main-905010e
     livenessProbe:
       failureThreshold: 3
       httpGet:

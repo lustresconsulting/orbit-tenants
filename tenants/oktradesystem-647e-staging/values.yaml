@@ -5,7 +5,7 @@ components:
     - secretRef:
         name: backend-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -42,7 +42,7 @@ components:
     - secretRef:
         name: celery-beat-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -76,7 +76,7 @@ components:
     - secretRef:
         name: celery-worker-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -104,7 +104,7 @@ components:
     - secretRef:
         name: frontend-env
     image:
-      repository: ""
+      repository: ghcr.io/sunnepah/oktradesystem-frontend
       tag: latest
     port: 3000
     replicas: 1
