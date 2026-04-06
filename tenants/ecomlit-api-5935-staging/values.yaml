@@ -5,7 +5,7 @@ components:
     - secretRef:
         name: admin-service-env
     image:
-      repository: ""
+      repository: ghcr.io/ecomlit/org-api-admin-service
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -36,7 +36,7 @@ components:
     - secretRef:
         name: api-gateway-env
     image:
-      repository: ""
+      repository: ghcr.io/ecomlit/org-api-api-gateway
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -67,7 +67,7 @@ components:
     - secretRef:
         name: consumer-service-env
     image:
-      repository: ""
+      repository: ghcr.io/ecomlit/org-api-consumer-service
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -98,7 +98,7 @@ components:
     - secretRef:
         name: merchant-service-env
     image:
-      repository: ""
+      repository: ghcr.io/ecomlit/org-api-merchant-service
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -125,7 +125,7 @@ components:
         memory: 128Mi
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: orbit
 hpa:
@@ -145,7 +145,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
@@ -164,7 +164,7 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  version: "17"
+  version: '17'
 tenant:
   namespace: t-ecomlit-api-5935-staging
   plan: starter
