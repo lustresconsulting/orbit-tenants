@@ -5,7 +5,7 @@ components:
     - secretRef:
         name: backend-env
     image:
-      repository: ''
+      repository: ""
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -23,7 +23,7 @@ components:
       initialDelaySeconds: 30
       periodSeconds: 10
     replicas: 1
-    resources: &id001
+    resources:
       limits:
         cpu: 250m
         memory: 256Mi
@@ -42,7 +42,7 @@ components:
     - secretRef:
         name: celery-beat-env
     image:
-      repository: ''
+      repository: ""
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -57,7 +57,13 @@ components:
       tcpSocket:
         port: null
     replicas: 1
-    resources: *id001
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
   celery-worker:
     command:
     - celery
@@ -70,7 +76,7 @@ components:
     - secretRef:
         name: celery-worker-env
     image:
-      repository: ''
+      repository: ""
       tag: latest
     livenessProbe:
       failureThreshold: 3
@@ -85,15 +91,84 @@ components:
       tcpSocket:
         port: null
     replicas: 1
-    resources: *id001
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
   frontend:
     enabled: true
     envFrom:
     - secretRef:
         name: frontend-env
     image:
-      repository: ''
+      repository: ""
       tag: latest
     port: 3000
     replicas: 1
-    resources: *id001
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+customDomain:
+  enabled: false
+  hostname: ""
+database:
+  mode: orbit
+hpa:
+  enabled: true
+  maxReplicas: 10
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+ingress:
+  enabled: true
+  gatewayName: orbit-gateway
+  gatewayNamespace: orbit-system
+  hostname: oktradesystem-647e-staging.orbit.lustres.dev
+  tls: true
+monitoring:
+  enabled: true
+  grafanaDashboard:
+    enabled: true
+    labels:
+      grafana_dashboard: "1"
+  serviceMonitor:
+    interval: 30s
+    path: /metrics
+    port: metrics
+    scrapeTimeout: 10s
+pdb:
+  enabled: true
+  minAvailable: 1
+postgres:
+  database: appdb
+  enabled: true
+  existingSecret: tenant-db-credentials
+  existingSecretKey: password
+  instances: 1
+  postgresUser: tenant
+  storage:
+    size: 5Gi
+    storageClass: local-path
+  version: "17"
+tenant:
+  namespace: t-oktradesystem-647e-staging
+  plan: starter
+  resourcePrefix: t-oktradesystem-647e-staging
+  slug: oktradesystem-647e-staging
+valkey:
+  enabled: true
+  existingSecret: tenant-valkey-credentials
+  existingSecretKey: password
+  image:
+    repository: valkey/valkey
+    tag: 7.2-alpine
+  storage:
+    size: 1Gi
+    storageClass: local-path
