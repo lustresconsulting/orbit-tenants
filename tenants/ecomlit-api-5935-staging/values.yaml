@@ -34,6 +34,7 @@ components:
         cpu: 100m
         memory: 128Mi
     type: backend
+    migrationCommand: "pnpm run-migration"
 customDomain:
   enabled: false
   hostname: ""
