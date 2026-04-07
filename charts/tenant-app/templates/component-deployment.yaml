@@ -45,7 +45,6 @@ spec:
           envFrom:
             - secretRef:
                 name: tenant-secrets-{{ $name }}
-                optional: true
           {{- end }}
           resources:
             {{- toYaml $comp.resources | nindent 12 }}
