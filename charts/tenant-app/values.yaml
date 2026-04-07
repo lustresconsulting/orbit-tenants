@@ -58,9 +58,17 @@ valkey:
       cpu: 200m
       memory: 256Mi
 
-# --- Secrets (ExternalSecret via infisical-orbit-tenants ClusterSecretStore) ---
+# --- Secrets (mounted as envFrom on every component) ---
+# The orbit operator emits a single per-tenant Secret (default name:
+# "tenant-secrets-backend") in the tenant namespace via ESO. All sub-components
+# in this chart mount that same Secret. The legacy chart-emitted ExternalSecret
+# (templates/externalsecret.yaml) is dormant unless a component declares
+# `secrets:` in values.yaml — left in place for forward compatibility.
 secrets:
   enabled: true
+  # Name of the operator-emitted Secret in the tenant namespace.
+  # Override per-tenant if the operator's component model changes.
+  secretName: tenant-secrets-backend
 
 # --- Monitoring (ServiceMonitor + Grafana Dashboard) ---
 monitoring:
