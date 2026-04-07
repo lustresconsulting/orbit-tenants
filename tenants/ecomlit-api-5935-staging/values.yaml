@@ -1,7 +1,9 @@
 components:
   merchant-service:
+    command:
+    - node
+    - /app/apps/merchant-service/dist/main.js
     enabled: true
-    command: ["node", "/app/apps/merchant-service/dist/main.js"]
     envFrom:
     - secretRef:
         name: merchant-service-env
