@@ -6,7 +6,7 @@ components:
         name: merchant-service-env
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-merchant-service
-      tag: cbe61049e8c8b2bfde280922c90dc88d0e144e9b
+      tag: 94de31608543ebc83bfbf82d3a1bb9f9f871e81d
     livenessProbe:
       failureThreshold: 3
       httpGet:
@@ -33,7 +33,7 @@ components:
     type: backend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: orbit
 hpa:
@@ -53,7 +53,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
@@ -72,7 +72,7 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  version: "17"
+  version: '17'
 tenant:
   namespace: t-ecomlit-api-5935-staging
   plan: starter
