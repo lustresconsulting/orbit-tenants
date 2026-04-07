@@ -39,6 +39,20 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 {{- end }}
 
 {{/*
+Stable labels — same as common labels but WITHOUT helm.sh/chart.
+Use this for any field that Kubernetes treats as immutable (e.g. StatefulSet
+volumeClaimTemplates metadata, Job selectors). Including helm.sh/chart there
+would cause every chart version bump to trigger "Forbidden: updates to
+spec ... are forbidden" sync errors.
+*/}}
+{{- define "tenant-app.labelsStable" -}}
+orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
+orbit.sh/managed-by: orbit-operator
+app.kubernetes.io/part-of: {{ include "tenant-app.fullname" . }}
+app.kubernetes.io/managed-by: argocd
+{{- end }}
+
+{{/*
 App selector labels
 */}}
 {{- define "tenant-app.selectorLabels" -}}
