@@ -36,7 +36,7 @@ components:
     type: backend
 customDomain:
   enabled: false
-  hostname: ''
+  hostname: ""
 database:
   mode: orbit
 hpa:
@@ -56,7 +56,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: '1'
+      grafana_dashboard: "1"
   serviceMonitor:
     interval: 30s
     path: /metrics
@@ -75,7 +75,7 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  version: '17'
+  version: "17"
 tenant:
   namespace: t-ecomlit-api-5935-staging
   plan: starter
