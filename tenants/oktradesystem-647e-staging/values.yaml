@@ -95,11 +95,11 @@ components:
     replicas: 1
     resources:
       limits:
-        cpu: 250m
-        memory: 256Mi
+        cpu: 500m
+        memory: 512Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     type: worker
   frontend:
     enabled: true
