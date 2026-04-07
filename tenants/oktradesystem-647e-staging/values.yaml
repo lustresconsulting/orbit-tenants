@@ -11,15 +11,15 @@ components:
       failureThreshold: 3
       httpGet:
         path: /health
-        port: 8000
+        port: 5000
       initialDelaySeconds: 60
       periodSeconds: 10
-    port: 8000
+    port: 5000
     readinessProbe:
       failureThreshold: 3
       httpGet:
         path: /health
-        port: 8000
+        port: 5000
       initialDelaySeconds: 30
       periodSeconds: 10
     replicas: 1
@@ -35,7 +35,7 @@ components:
     command:
     - celery
     - -A
-    - config
+    - src.celery_app
     - beat
     - --loglevel=info
     enabled: true
@@ -70,7 +70,7 @@ components:
     command:
     - celery
     - -A
-    - config
+    - src.celery_app
     - worker
     - --loglevel=info
     enabled: true
