@@ -17,6 +17,7 @@ components:
         port: 8000
       initialDelaySeconds: 30
       periodSeconds: 10
+    migrationCommand: pnpm run-migration
     port: 8000
     readinessProbe:
       failureThreshold: 3
@@ -34,7 +35,6 @@ components:
         cpu: 100m
         memory: 128Mi
     type: backend
-    migrationCommand: "pnpm run-migration"
 customDomain:
   enabled: false
   hostname: ""
