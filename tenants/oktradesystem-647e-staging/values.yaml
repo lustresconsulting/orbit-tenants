@@ -6,7 +6,7 @@ components:
         name: backend-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: latest
+      tag: main-d926707
     livenessProbe:
       failureThreshold: 3
       httpGet:
@@ -44,7 +44,7 @@ components:
         name: celery-beat-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: latest
+      tag: main-d926707
     livenessProbe:
       failureThreshold: 3
       initialDelaySeconds: 60
@@ -79,7 +79,7 @@ components:
         name: celery-worker-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
-      tag: latest
+      tag: main-d926707
     livenessProbe:
       failureThreshold: 3
       initialDelaySeconds: 60
@@ -108,7 +108,7 @@ components:
         name: frontend-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-frontend
-      tag: latest
+      tag: main-d926707
     port: 3000
     replicas: 1
     resources:
