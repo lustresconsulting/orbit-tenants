@@ -4,6 +4,9 @@ components:
     - node
     - /app/apps/merchant-service/dist/main.js
     enabled: true
+    env:
+      - name: DB_TYPE
+        value: postgresql
     envFrom:
     - secretRef:
         name: merchant-service-env
