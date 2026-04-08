@@ -42,7 +42,7 @@ customDomain:
   enabled: false
   hostname: ""
 database:
-  mode: orbit
+  mode: external
 hpa:
   enabled: true
   maxReplicas: 10
@@ -70,16 +70,7 @@ pdb:
   enabled: true
   minAvailable: 1
 postgres:
-  database: appdb
-  enabled: true
-  existingSecret: tenant-db-credentials
-  existingSecretKey: password
-  instances: 1
-  postgresUser: tenant
-  storage:
-    size: 5Gi
-    storageClass: local-path
-  version: "17"
+  enabled: false
 tenant:
   namespace: t-ecomlit-api-5935-staging
   plan: starter
