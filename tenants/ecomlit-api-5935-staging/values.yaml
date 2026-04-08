@@ -12,7 +12,7 @@ components:
         name: merchant-service-env
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-merchant-service
-      tag: 70f28affb3dcc156e98efb609202bc89cb8a7fce
+      tag: ae506487f19377febfbbd38933759428724ca784
     livenessProbe:
       failureThreshold: 3
       httpGet:
