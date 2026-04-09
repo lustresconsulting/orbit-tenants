@@ -17,16 +17,16 @@ components:
       failureThreshold: 3
       httpGet:
         path: /health
-        port: 8000
+        port: 5000
       initialDelaySeconds: 30
       periodSeconds: 10
     migrationCommand: pnpm run-migration
-    port: 8000
+    port: 5000
     readinessProbe:
       failureThreshold: 3
       httpGet:
         path: /health
-        port: 8000
+        port: 5000
       initialDelaySeconds: 15
       periodSeconds: 10
     replicas: 1
