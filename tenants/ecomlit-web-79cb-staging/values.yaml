@@ -26,15 +26,7 @@ postgres:
   enabled: false
 
 valkey:
-  enabled: true
-  image:
-    repository: valkey/valkey
-    tag: "7.2-alpine"
-  storage:
-    size: 1Gi
-    storageClass: local-path
-  existingSecret: tenant-valkey-credentials
-  existingSecretKey: password
+  enabled: false
 
 ingress:
   enabled: true
