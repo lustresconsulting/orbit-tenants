@@ -108,7 +108,7 @@ components:
         name: frontend-env
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-oktradesystem-647e-staging-frontend
-      tag: a7585f55a4390a51d921eba5c4fa49a218a72488
+      tag: 6e98b9ea85d659c2051c12fec77c3283bbaf22b0
     port: 3000
     replicas: 1
     resources:
@@ -121,7 +121,7 @@ components:
     type: frontend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: orbit
 hpa:
@@ -141,7 +141,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
@@ -160,7 +160,7 @@ postgres:
   storage:
     size: 5Gi
     storageClass: local-path
-  version: "17"
+  version: '17'
 tenant:
   namespace: t-oktradesystem-647e-staging
   plan: starter
