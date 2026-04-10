@@ -2,9 +2,6 @@ components:
   backend:
     enabled: true
     migrationCommand: alembic -c /app/alembic.ini upgrade head
-    envFrom:
-    - secretRef:
-        name: backend-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-d926707
