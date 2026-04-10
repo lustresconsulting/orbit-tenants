@@ -14,6 +14,9 @@ components:
         cpu: 100m
         memory: 128Mi
     type: frontend
+    env:
+      - name: NEXT_PUBLIC_API_URL
+        value: "https://api-ecomlit-api-5935-staging.orbit.lustres.dev/graphql"
 customDomain:
   enabled: false
   hostname: ""
