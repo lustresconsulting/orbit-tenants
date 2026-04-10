@@ -41,10 +41,14 @@ spec:
           env:
             {{- toYaml $comp.env | nindent 12 }}
           {{- end }}
-          {{- if $.Values.secrets.enabled }}
+          {{- if $comp.envFrom }}
+          envFrom:
+            {{- toYaml $comp.envFrom | nindent 12 }}
+          {{- else }}
           envFrom:
             - secretRef:
-                name: {{ $.Values.secrets.secretName | default "tenant-secrets-backend" }}
+                name: tenant-secrets-{{ $name }}
+                optional: true
           {{- end }}
           resources:
             {{- toYaml $comp.resources | nindent 12 }}
