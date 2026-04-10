@@ -45,6 +45,9 @@ valkey:
   existingSecret: tenant-valkey-credentials
   existingSecretKey: password
 
+secrets:
+  enabled: false
+
 ingress:
   enabled: true
   hostname: ns1-task-0a34-staging.orbit.lustres.dev
