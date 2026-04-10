@@ -31,8 +31,6 @@ ingress:
   gatewayNamespace: orbit-system
   hostname: ecomlit-web-79cb-staging.orbit.lustres.dev
   tls: true
-secrets:
-  enabled: false
 monitoring:
   enabled: true
   grafanaDashboard:
