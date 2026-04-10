@@ -36,11 +36,19 @@ spec:
             - sh
             - -c
             - {{ $comp.migrationCommand | quote }}
-          {{- if $.Values.secrets.enabled }}
+          {{- if $comp.env }}
+          env:
+            {{- toYaml $comp.env | nindent 12 }}
+          {{- end }}
+          {{- if or $.Values.secrets.enabled $comp.envFrom }}
           envFrom:
+            {{- if $.Values.secrets.enabled }}
             - secretRef:
-                name: tenant-app-secrets
-                optional: true
+                name: {{ $.Values.secrets.secretName | default "tenant-secrets-backend" }}
+            {{- end }}
+            {{- if $comp.envFrom }}
+            {{- toYaml $comp.envFrom | nindent 12 }}
+            {{- end }}
           {{- end }}
           resources:
             requests:
