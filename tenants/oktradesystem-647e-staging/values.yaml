@@ -1,7 +1,6 @@
 components:
   backend:
     enabled: true
-    migrationCommand: alembic -c /app/alembic.ini upgrade head
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-d926707
@@ -12,6 +11,7 @@ components:
         port: 5000
       initialDelaySeconds: 60
       periodSeconds: 10
+    migrationCommand: alembic -c /app/alembic.ini upgrade head
     port: 5000
     readinessProbe:
       failureThreshold: 3
