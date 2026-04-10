@@ -1,6 +1,9 @@
 components:
   mapp:
     enabled: true
+    env:
+    - name: NEXT_PUBLIC_API_URL
+      value: https://api-ecomlit-api-5935-staging.orbit.lustres.dev/graphql
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-mapp
       tag: 0209b7b514b3868c2dfbe1370b6d135a3fb14fa4
@@ -14,9 +17,6 @@ components:
         cpu: 100m
         memory: 128Mi
     type: frontend
-    env:
-      - name: NEXT_PUBLIC_API_URL
-        value: "https://api-ecomlit-api-5935-staging.orbit.lustres.dev/graphql"
 customDomain:
   enabled: false
   hostname: ""
