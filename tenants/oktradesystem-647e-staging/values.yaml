@@ -1,6 +1,7 @@
 components:
   backend:
     enabled: true
+    migrationCommand: alembic -c /app/alembic.ini upgrade head
     envFrom:
     - secretRef:
         name: backend-env
