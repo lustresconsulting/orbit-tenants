@@ -159,6 +159,8 @@ postgres:
     size: 5Gi
     storageClass: local-path
   version: "17"
+secrets:
+  enabled: false
 tenant:
   namespace: t-oktradesystem-647e-staging
   plan: starter
