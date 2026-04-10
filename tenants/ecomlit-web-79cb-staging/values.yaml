@@ -47,6 +47,8 @@ pdb:
   minAvailable: 1
 postgres:
   enabled: false
+secrets:
+  enabled: false
 tenant:
   namespace: t-ecomlit-web-79cb-staging
   plan: starter
