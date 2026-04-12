@@ -9,7 +9,7 @@ components:
       value: postgresql
     envFrom:
     - secretRef:
-        name: merchant-service-env
+        name: tenant-secrets-backend
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-merchant-service
       tag: ee60b1ac4f838f402c6137bd2119505a89bb50c4
