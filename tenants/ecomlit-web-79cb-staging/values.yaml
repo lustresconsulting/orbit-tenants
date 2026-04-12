@@ -1,4 +1,19 @@
 components:
+  capp:
+    enabled: true
+    image:
+      repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-capp
+      tag: latest
+    port: 3000
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    type: frontend
   mapp:
     enabled: true
     env:
