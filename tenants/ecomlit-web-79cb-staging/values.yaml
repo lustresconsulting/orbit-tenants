@@ -9,7 +9,7 @@ components:
     resources:
       limits:
         cpu: 250m
-        memory: 256Mi
+        memory: 1Gi
       requests:
         cpu: 100m
         memory: 128Mi
@@ -27,7 +27,7 @@ components:
     resources:
       limits:
         cpu: 250m
-        memory: 256Mi
+        memory: 1Gi
       requests:
         cpu: 100m
         memory: 128Mi
@@ -73,12 +73,4 @@ tenant:
   resourcePrefix: t-ecomlit-web-79cb-staging
   slug: ecomlit-web-79cb-staging
 valkey:
-  enabled: true
-  existingSecret: tenant-valkey-credentials
-  existingSecretKey: password
-  image:
-    repository: valkey/valkey
-    tag: 7.2-alpine
-  storage:
-    size: 1Gi
-    storageClass: local-path
+  enabled: false
