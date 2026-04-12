@@ -36,8 +36,17 @@ spec:
             - sh
             - -c
             - {{ $comp.migrationCommand | quote }}
-          {{- if $comp.env }}
           env:
+            # Ensure writable home/caches for package managers (pnpm, nx, corepack) running as non-root
+            - name: HOME
+              value: /tmp
+            - name: NX_DAEMON
+              value: "false"
+            - name: NX_CACHE_DIRECTORY
+              value: /tmp/.nx-cache
+            - name: COREPACK_HOME
+              value: /tmp/.corepack
+          {{- if $comp.env }}
             {{- toYaml $comp.env | nindent 12 }}
           {{- end }}
           {{- if $comp.envFrom }}
@@ -55,7 +64,7 @@ spec:
               memory: 128Mi
             limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 2Gi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -64,8 +73,12 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: nx-cache
+              mountPath: /app/.nx
       volumes:
         - name: tmp
+          emptyDir: {}
+        - name: nx-cache
           emptyDir: {}
       imagePullSecrets:
         - name: ghcr-pull-secret
