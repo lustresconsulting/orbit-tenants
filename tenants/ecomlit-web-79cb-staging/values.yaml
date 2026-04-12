@@ -6,7 +6,7 @@ components:
       value: https://api-ecomlit-api-5935-staging.orbit.lustres.dev/graphql
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-mapp
-      tag: 0209b7b514b3868c2dfbe1370b6d135a3fb14fa4
+      tag: 55a489bd1cd7c86dab70504d702b4c72c442545f
     port: 3000
     replicas: 1
     resources:
@@ -19,7 +19,7 @@ components:
     type: frontend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: external
 hpa:
@@ -39,7 +39,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
