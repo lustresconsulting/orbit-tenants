@@ -37,9 +37,6 @@ components:
     - beat
     - --loglevel=info
     enabled: true
-    envFrom:
-    - secretRef:
-        name: celery-beat-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-d926707
@@ -72,9 +69,6 @@ components:
     - worker
     - --loglevel=info
     enabled: true
-    envFrom:
-    - secretRef:
-        name: celery-worker-env
     image:
       repository: ghcr.io/sunnepah/oktradesystem-backend
       tag: main-d926707
@@ -101,9 +95,6 @@ components:
     type: worker
   frontend:
     enabled: true
-    envFrom:
-    - secretRef:
-        name: frontend-env
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-oktradesystem-647e-staging-frontend
       tag: 6e98b9ea85d659c2051c12fec77c3283bbaf22b0
