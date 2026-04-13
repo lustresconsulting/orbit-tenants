@@ -1,6 +1,6 @@
 components:
   capp:
-    enabled: true
+    enabled: false
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-capp
       tag: latest
