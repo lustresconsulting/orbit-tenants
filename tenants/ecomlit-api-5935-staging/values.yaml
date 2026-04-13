@@ -1,4 +1,42 @@
 components:
+  consumer-service:
+    command:
+    - node
+    - /app/apps/consumer-service/dist/main.js
+    enabled: true
+    env:
+    - name: DB_TYPE
+      value: postgresql
+    envFrom:
+    - secretRef:
+        name: tenant-secrets-consumer-service
+    image:
+      repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-consumer-service
+      tag: latest
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /health
+        port: 5000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    port: 5000
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /health
+        port: 5000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    type: backend
   merchant-service:
     command:
     - node
@@ -38,47 +76,9 @@ components:
         cpu: 100m
         memory: 128Mi
     type: backend
-  consumer-service:
-    command:
-    - node
-    - /app/apps/consumer-service/dist/main.js
-    enabled: true
-    env:
-    - name: DB_TYPE
-      value: postgresql
-    envFrom:
-    - secretRef:
-        name: tenant-secrets-consumer-service
-    image:
-      repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-consumer-service
-      tag: latest
-    livenessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /health
-        port: 5000
-      initialDelaySeconds: 30
-      periodSeconds: 10
-    port: 5000
-    readinessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /health
-        port: 5000
-      initialDelaySeconds: 15
-      periodSeconds: 10
-    replicas: 1
-    resources:
-      limits:
-        cpu: 250m
-        memory: 1Gi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    type: backend
 customDomain:
   enabled: false
-  hostname: ''
+  hostname: ""
 database:
   mode: external
 hpa:
@@ -98,7 +98,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: '1'
+      grafana_dashboard: "1"
   serviceMonitor:
     interval: 30s
     path: /metrics
