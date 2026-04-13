@@ -12,6 +12,7 @@ metadata:
 spec:
   serviceName: {{ include "tenant-app.valkeyName" . }}-headless
   replicas: 1
+  minReadySeconds: 10
   selector:
     matchLabels:
       orbit.sh/tenant: {{ .Values.tenant.slug | quote }}
