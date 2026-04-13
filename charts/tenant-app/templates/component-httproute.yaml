@@ -1,11 +1,6 @@
 {{- range $name, $comp := .Values.components }}
 {{- if and $comp.enabled (ne $comp.type "worker") (ne ($comp.port | int) 0) }}
-{{- $hostname := "" }}
-{{- if eq $comp.type "frontend" }}
-{{- $hostname = printf "%s.orbit.lustres.dev" $.Values.tenant.slug }}
-{{- else }}
-{{- $hostname = printf "api-%s.orbit.lustres.dev" $.Values.tenant.slug }}
-{{- end }}
+{{- $hostname := include "tenant-app.componentHostname" (dict "name" $name "comp" $comp "root" $) }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
