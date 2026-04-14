@@ -6,6 +6,7 @@ tenant:
   slug: ""          # Required: e.g. "acme-corp"
   namespace: ""     # Required: e.g. "tenant-acme-corp-prod"
   plan: starter     # starter | growth | scale
+  orgId: ""         # Organization UUID — enables cross-namespace traffic within same org
 
 # --- Custom domain (optional) ---
 # When enabled, creates an additional HTTPRoute + Certificate for the custom domain.

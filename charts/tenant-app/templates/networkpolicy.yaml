@@ -1,5 +1,6 @@
 # NetworkPolicy — tenant isolation
-# Restricts inbound traffic to tenant pods; only allows from orbit-system gateway and within namespace.
+# Restricts inbound traffic to tenant pods; only allows from orbit-system gateway,
+# within namespace, and (when orgId is set) from other namespaces in the same org.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -25,6 +26,13 @@ spec:
     # Allow inbound from within the same tenant namespace
     - from:
         - podSelector: {}
+    {{- if .Values.tenant.orgId }}
+    # Allow inbound from other namespaces in the same organization
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              orbit.sh/org: {{ .Values.tenant.orgId }}
+    {{- end }}
   egress:
     # Allow DNS
     - ports:
@@ -48,3 +56,10 @@ spec:
               - 10.0.0.0/8
               - 172.16.0.0/12
               - 192.168.0.0/16
+    {{- if .Values.tenant.orgId }}
+    # Allow outbound to other namespaces in the same organization
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              orbit.sh/org: {{ .Values.tenant.orgId }}
+    {{- end }}
