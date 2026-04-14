@@ -79,37 +79,13 @@ Per-component hostname.
 
 Receives a dict with:
   .name  — component key (string)
-  .comp  — component values map
+  .comp  — component values map (kept for interface compatibility, unused)
   .root  — top-level $ context
 
-Logic:
-  - Count enabled, non-worker, non-zero-port components that share the same type.
-  - The "primary" for a given type is the alphabetically first such component name.
-  - Primary frontend  → {slug}.orbit.lustres.dev
-  - Primary backend   → api-{slug}.orbit.lustres.dev
-  - Non-primary       → {component-name}-{slug}.orbit.lustres.dev
-
-This keeps existing single-component tenants fully backward-compatible.
+Every component gets: {component-name}-{slug}.orbit.lustres.dev
 */}}
 {{- define "tenant-app.componentHostname" -}}
 {{- $myName := .name }}
-{{- $myType := .comp.type }}
 {{- $slug   := .root.Values.tenant.slug }}
-{{- $isPrimary := true }}
-{{- range $otherName, $otherComp := .root.Values.components }}
-{{-   if and $otherComp.enabled (ne $otherComp.type "worker") (ne ($otherComp.port | int) 0) (eq $otherComp.type $myType) }}
-{{-     if lt $otherName $myName }}
-{{-       $isPrimary = false }}
-{{-     end }}
-{{-   end }}
-{{- end }}
-{{- if $isPrimary }}
-{{-   if eq $myType "frontend" }}
-{{-     printf "%s.orbit.lustres.dev" $slug }}
-{{-   else }}
-{{-     printf "api-%s.orbit.lustres.dev" $slug }}
-{{-   end }}
-{{- else }}
-{{-   printf "%s-%s.orbit.lustres.dev" $myName $slug }}
-{{- end }}
+{{- printf "%s-%s.orbit.lustres.dev" $myName $slug }}
 {{- end }}
