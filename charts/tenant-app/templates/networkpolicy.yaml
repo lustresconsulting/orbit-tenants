@@ -43,11 +43,6 @@ spec:
     # Allow outbound to the same tenant namespace (postgres, valkey, inter-component)
     - to:
         - podSelector: {}
-    # Allow outbound to orbit-system (Redis, API, Weaviate, LiteLLM — used by agent)
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: orbit-system
     # Allow outbound to kube-system (CoreDNS, etc.)
     - to:
         - namespaceSelector:
