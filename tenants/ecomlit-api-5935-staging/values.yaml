@@ -50,7 +50,7 @@ components:
         name: tenant-secrets-merchant-service
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-merchant-service
-      tag: ee60b1ac4f838f402c6137bd2119505a89bb50c4
+      tag: ff4ca1b52affab96963c1c32130ad26878049280
     livenessProbe:
       failureThreshold: 3
       httpGet:
@@ -78,7 +78,7 @@ components:
     type: backend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: external
 hpa:
@@ -98,7 +98,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
