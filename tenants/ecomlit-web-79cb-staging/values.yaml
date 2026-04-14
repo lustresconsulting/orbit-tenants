@@ -9,7 +9,7 @@ components:
     resources:
       limits:
         cpu: 250m
-        memory: 1Gi
+        memory: 256Mi
       requests:
         cpu: 100m
         memory: 128Mi
@@ -27,7 +27,7 @@ components:
     resources:
       limits:
         cpu: 250m
-        memory: 1Gi
+        memory: 256Mi
       requests:
         cpu: 100m
         memory: 128Mi
