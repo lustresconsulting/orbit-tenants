@@ -3,7 +3,7 @@ components:
     enabled: true
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-capp
-      tag: latest
+      tag: 1608a48b89e795c3f83674be79c832dac3a0e7a2
     port: 3000
     replicas: 1
     resources:
