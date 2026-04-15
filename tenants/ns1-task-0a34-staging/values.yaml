@@ -7,6 +7,7 @@ tenant:
   namespace: t-ns1-task-0a34-staging
   resourcePrefix: t-ns1-task-0a34-staging
   plan: starter
+  orgId: 1634917b-5c45-4d56-a8d5-9017cc56b7da
 
 database:
   mode: orbit
