@@ -113,6 +113,7 @@ secrets:
   enabled: false
 tenant:
   namespace: t-ecomlit-api-5935-staging
+  orgId: 0275c4a1-f131-4590-81cd-b55d226517b7
   plan: starter
   resourcePrefix: t-ecomlit-api-5935-staging
   slug: ecomlit-api-5935-staging
