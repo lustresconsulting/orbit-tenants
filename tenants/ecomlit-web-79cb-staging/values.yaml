@@ -71,6 +71,7 @@ secrets:
   enabled: false
 tenant:
   namespace: t-ecomlit-web-79cb-staging
+  orgId: 0275c4a1-f131-4590-81cd-b55d226517b7
   plan: starter
   resourcePrefix: t-ecomlit-web-79cb-staging
   slug: ecomlit-web-79cb-staging
