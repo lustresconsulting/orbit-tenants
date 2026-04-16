@@ -1,0 +1,6 @@
+apiVersion: v2
+name: empty-viewer
+description: No-op chart used as the target source for repurposed ArgoCD Applications (Phase 34+)
+type: application
+version: 0.1.0
+appVersion: "1"
