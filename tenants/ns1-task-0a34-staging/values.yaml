@@ -1,5 +1,8 @@
 components:
   api:
+    enabled: true
+    type: backend
+    port: 3000
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ns1-task-0a34-staging-api
       tag: f221339d676d4017c05ee67deb7f9a84d9a7d961
