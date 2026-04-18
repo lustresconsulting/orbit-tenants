@@ -1,65 +1,65 @@
-tenant:
-  slug: ns1-task-0a34-staging
-  namespace: t-ns1-task-0a34-staging
-  resourcePrefix: t-ns1-task-0a34-staging
-  plan: starter
-  orgId: 1634917b-5c45-4d56-a8d5-9017cc56b7da
+components:
+  api:
+    image:
+      repository: ghcr.io/lustresconsulting/orbit-tenant-ns1-task-0a34-staging-api
+      tag: f221339d676d4017c05ee67deb7f9a84d9a7d961
+customDomain:
+  enabled: false
+  hostname: ""
 database:
   mode: orbit
 hpa:
   enabled: true
-  minReplicas: 1
   maxReplicas: 10
+  minReplicas: 1
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
+ingress:
+  enabled: true
+  gatewayName: orbit-gateway
+  gatewayNamespace: orbit-system
+  hostname: ns1-task-0a34-staging.orbit.lustres.dev
+  tls: true
+monitoring:
+  enabled: true
+  grafanaDashboard:
+    enabled: true
+    labels:
+      grafana_dashboard: "1"
+  serviceMonitor:
+    interval: 30s
+    path: /metrics
+    port: metrics
+    scrapeTimeout: 10s
 pdb:
   enabled: true
   minAvailable: 1
 postgres:
+  database: appdb
   enabled: true
+  existingSecret: tenant-db-credentials
+  existingSecretKey: password
   instances: 1
+  postgresUser: tenant
   storage:
     size: 5Gi
     storageClass: local-path
-  existingSecret: tenant-db-credentials
-  existingSecretKey: password
-  postgresUser: tenant
-  database: appdb
-  version: '17'
+  version: "17"
+secrets:
+  enabled: false
+tenant:
+  namespace: t-ns1-task-0a34-staging
+  orgId: 1634917b-5c45-4d56-a8d5-9017cc56b7da
+  plan: starter
+  resourcePrefix: t-ns1-task-0a34-staging
+  slug: ns1-task-0a34-staging
 valkey:
   enabled: true
+  existingSecret: tenant-valkey-credentials
+  existingSecretKey: password
   image:
     repository: valkey/valkey
     tag: 7.2-alpine
   storage:
     size: 1Gi
     storageClass: local-path
-  existingSecret: tenant-valkey-credentials
-  existingSecretKey: password
-secrets:
-  enabled: false
-ingress:
-  enabled: true
-  hostname: ns1-task-0a34-staging.orbit.lustres.dev
-  gatewayName: orbit-gateway
-  gatewayNamespace: orbit-system
-  tls: true
-customDomain:
-  enabled: false
-  hostname: ''
-monitoring:
-  enabled: true
-  serviceMonitor:
-    interval: 30s
-    scrapeTimeout: 10s
-    path: /metrics
-    port: metrics
-  grafanaDashboard:
-    enabled: true
-    labels:
-      grafana_dashboard: '1'
-components:
-  api:
-    image:
-      repository: ghcr.io/lustresconsulting/orbit-tenant-ns1-task-0a34-staging-api
-      tag: f221339d676d4017c05ee67deb7f9a84d9a7d961
