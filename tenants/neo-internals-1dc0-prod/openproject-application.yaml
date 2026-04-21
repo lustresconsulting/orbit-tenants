@@ -15,6 +15,7 @@ spec:
     targetRevision: "*"
     helm:
       values: |
+        develop: true
         openproject:
           host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
           https: true
