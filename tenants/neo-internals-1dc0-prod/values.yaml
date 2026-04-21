@@ -5,10 +5,17 @@ customDomain:
 database:
   mode: orbit
 hpa:
-  enabled: false
-
+  enabled: true
+  maxReplicas: 10
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
 ingress:
-  enabled: false
+  enabled: true
+  gatewayName: orbit-gateway
+  gatewayNamespace: orbit-system
+  hostname: neo-internals-1dc0-prod.orbit.lustres.dev
+  tls: true
 monitoring:
   enabled: true
   grafanaDashboard:
@@ -21,7 +28,8 @@ monitoring:
     port: metrics
     scrapeTimeout: 10s
 pdb:
-  enabled: false
+  enabled: true
+  minAvailable: 1
 postgres:
   database: appdb
   enabled: true
@@ -42,4 +50,12 @@ tenant:
   resourcePrefix: t-neo-internals-1dc0-prod
   slug: neo-internals-1dc0-prod
 valkey:
-  enabled: false
+  enabled: true
+  existingSecret: tenant-valkey-credentials
+  existingSecretKey: password
+  image:
+    repository: valkey/valkey
+    tag: 7.2-alpine
+  storage:
+    size: 1Gi
+    storageClass: local-path
