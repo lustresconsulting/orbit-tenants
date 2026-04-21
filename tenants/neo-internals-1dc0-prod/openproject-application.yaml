@@ -51,20 +51,31 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-        web:
+        # root-level "resources" controls the web deployment (chart structure)
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+
+        # workers.default controls the worker-default deployment
+        workers:
+          default:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+
+        hocuspocus:
           resources:
             requests:
               cpu: 100m
               memory: 256Mi
-            limits:
-              cpu: 1000m
-              memory: 1Gi
-
-        worker:
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
             limits:
               cpu: 500m
               memory: 512Mi
