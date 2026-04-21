@@ -39,6 +39,7 @@ spec:
           enabled: true
           storageClassName: local-path
           size: 10Gi
+          accessMode: ReadWriteOnce
 
         ingress:
           enabled: true
