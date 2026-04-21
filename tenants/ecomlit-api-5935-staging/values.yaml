@@ -12,7 +12,7 @@ components:
         name: tenant-secrets-consumer-service
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-api-5935-staging-consumer-service
-      tag: e52c42d012f2ba46f71263617b51c040308f57e5
+      tag: ead4ccf376df603ecbe2c7cbc26c8daccbf6e673
     livenessProbe:
       failureThreshold: 3
       httpGet:
@@ -78,7 +78,7 @@ components:
     type: backend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: external
 hpa:
@@ -98,7 +98,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
