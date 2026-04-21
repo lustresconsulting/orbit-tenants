@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openproject
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: t-neo-internals-1dc0-prod
+  source:
+    repoURL: https://charts.openproject.org
+    chart: openproject
+    targetRevision: "*"
+    helm:
+      values: |
+        openproject:
+          host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
+          https: true
+
+        postgresql:
+          bundled: false
+          connection:
+            host: t-neo-internals-1dc0-prod-postgres-rw
+            port: 5432
+          auth:
+            database: appdb
+            username: tenant
+            existingSecret: tenant-db-credentials
+            secretKeys:
+              userPasswordKey: password
+
+        memcached:
+          bundled: true
+
+        persistence:
+          enabled: true
+          storageClassName: local-path
+          size: 10Gi
+
+        ingress:
+          enabled: true
+          ingressClassName: traefik
+          host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
+          tls: true
+          annotations:
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+
+        environment:
+          OPENPROJECT_SECRET__KEY__BASE:
+            valueFrom:
+              secretKeyRef:
+                name: openproject-secret-key
+                key: secret_key_base
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: t-neo-internals-1dc0-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true
