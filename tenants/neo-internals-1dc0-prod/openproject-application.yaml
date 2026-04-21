@@ -23,7 +23,7 @@ spec:
         postgresql:
           bundled: false
           connection:
-            host: t-neo-internals-1dc0-prod-postgres-rw
+            host: t-neo-internals-1dc0-prod-pg-rw
             port: 5432
           auth:
             database: appdb
