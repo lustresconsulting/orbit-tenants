@@ -43,7 +43,8 @@ spec:
           enabled: true
           ingressClassName: traefik
           host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
-          tls: true
+          tls:
+            enabled: true
           annotations:
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
             cert-manager.io/cluster-issuer: letsencrypt-prod
