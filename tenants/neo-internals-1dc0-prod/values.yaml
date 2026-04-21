@@ -6,7 +6,7 @@ database:
   mode: orbit
 hpa:
   enabled: true
-  maxReplicas: 10
+  maxReplicas: 50
   minReplicas: 1
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
@@ -38,7 +38,7 @@ postgres:
   instances: 1
   postgresUser: tenant
   storage:
-    size: 5Gi
+    size: 50Gi
     storageClass: local-path
   version: "17"
 secrets:
@@ -46,7 +46,7 @@ secrets:
 tenant:
   namespace: t-neo-internals-1dc0-prod
   orgId: 79f99a82-41f8-4d4d-8103-30589731e620
-  plan: starter
+  plan: scale
   resourcePrefix: t-neo-internals-1dc0-prod
   slug: neo-internals-1dc0-prod
 valkey:
@@ -57,5 +57,5 @@ valkey:
     repository: valkey/valkey
     tag: 7.2-alpine
   storage:
-    size: 1Gi
+    size: 10Gi
     storageClass: local-path
