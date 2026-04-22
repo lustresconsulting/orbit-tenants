@@ -1,6 +1,11 @@
 components:
   capp:
     enabled: true
+    env:
+    - name: NEXT_PUBLIC_CONSUMER_API_URL
+      value: https://consumer-service-ecomlit-api-5935-staging.orbit.lustres.dev/graphql
+    - name: NEXT_SERVER_CONSUMER_API_URL
+      value: http://ecomlit-api-5935-staging-consumer-service.t-ecomlit-api-5935-staging.svc.cluster.local:5000/graphql
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-capp
       tag: e9cde8946373d810dd3bb65cf6ac6762b0916898
@@ -19,8 +24,6 @@ components:
     env:
     - name: NEXT_PUBLIC_API_URL
       value: https://merchant-service-ecomlit-api-5935-staging.orbit.lustres.dev/graphql
-    - name: NEXT_INTERNAL_API_URL
-      value: http://ecomlit-api-5935-staging-merchant-service.t-ecomlit-api-5935-staging.svc.cluster.local:5000/graphql
     - name: NEXT_SERVER_API_URL
       value: http://ecomlit-api-5935-staging-merchant-service.t-ecomlit-api-5935-staging.svc.cluster.local:5000/graphql
     image:
