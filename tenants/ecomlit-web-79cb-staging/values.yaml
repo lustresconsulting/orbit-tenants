@@ -38,7 +38,7 @@ components:
     type: frontend
 customDomain:
   enabled: false
-  hostname: ''
+  hostname: ""
 database:
   mode: external
 hpa:
@@ -58,7 +58,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: '1'
+      grafana_dashboard: "1"
   serviceMonitor:
     interval: 30s
     path: /metrics
