@@ -39,11 +39,6 @@ components:
 customDomain:
   enabled: false
   hostname: ""
-wildcardDomain:
-  enabled: true
-  hostname: "*.staging.ecomlit.store"
-  gatewaySection: websecure-ecomlit-staging
-  component: capp
 database:
   mode: external
 hpa:
@@ -84,3 +79,8 @@ tenant:
   slug: ecomlit-web-79cb-staging
 valkey:
   enabled: false
+wildcardDomain:
+  component: capp
+  enabled: true
+  gatewaySection: websecure-ecomlit-staging
+  hostname: '*.staging.ecomlit.store'
