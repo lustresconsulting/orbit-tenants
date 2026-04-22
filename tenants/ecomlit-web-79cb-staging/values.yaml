@@ -8,7 +8,7 @@ components:
       value: http://ecomlit-api-5935-staging-consumer-service.t-ecomlit-api-5935-staging.svc.cluster.local:5000/graphql
     image:
       repository: ghcr.io/lustresconsulting/orbit-tenant-ecomlit-web-79cb-staging-capp
-      tag: e9cde8946373d810dd3bb65cf6ac6762b0916898
+      tag: 1786f882ab53a185db588026f9cfc8b9cd3c355a
     port: 3000
     replicas: 1
     resources:
@@ -41,7 +41,7 @@ components:
     type: frontend
 customDomain:
   enabled: false
-  hostname: ""
+  hostname: ''
 database:
   mode: external
 hpa:
@@ -61,7 +61,7 @@ monitoring:
   grafanaDashboard:
     enabled: true
     labels:
-      grafana_dashboard: "1"
+      grafana_dashboard: '1'
   serviceMonitor:
     interval: 30s
     path: /metrics
