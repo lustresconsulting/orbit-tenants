@@ -1,0 +1,25 @@
+{{- if and .Values.wildcardDomain.enabled (ne .Values.wildcardDomain.hostname "") }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Values.tenant.slug }}-wildcard-domain
+  namespace: {{ .Values.tenant.namespace }}
+  labels:
+    orbit.sh/tenant: {{ .Values.tenant.slug }}
+    orbit.sh/custom-domain: "true"
+spec:
+  parentRefs:
+    - name: orbit-gateway
+      namespace: orbit-system
+      sectionName: {{ .Values.wildcardDomain.gatewaySection }}
+  hostnames:
+    - {{ .Values.wildcardDomain.hostname | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ .Values.tenant.slug }}-{{ .Values.wildcardDomain.component }}
+          port: {{ index .Values.components .Values.wildcardDomain.component "port" }}
+{{- end }}

@@ -15,6 +15,16 @@ customDomain:
   enabled: false
   hostname: ""
 
+# --- Wildcard custom domain (optional) ---
+# For platform wildcard domains (e.g. *.staging.ecomlit.store).
+# Certificate and Gateway listener are managed as platform resources (orbit repo).
+# This only creates the HTTPRoute in the tenant namespace.
+wildcardDomain:
+  enabled: false
+  hostname: ""        # e.g. "*.staging.ecomlit.store"
+  gatewaySection: "" # sectionName of the Gateway listener (e.g. "websecure-ecomlit-staging")
+  component: ""      # component name to route to (e.g. "capp")
+
 # --- Database mode ---
 # "orbit" = CNPG PostgreSQL provisioned in-namespace (default)
 # "external" = user-provided connection string (Supabase, Neon, etc.)
