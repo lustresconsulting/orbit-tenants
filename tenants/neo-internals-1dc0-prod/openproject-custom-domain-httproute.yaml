@@ -8,6 +8,11 @@ metadata:
     orbit.sh/component: openproject
     orbit.sh/tenant: neo-internals-1dc0-prod
     orbit.sh/custom-domain: "true"
+  annotations:
+    # Applied imperatively; the tenant wrapper ArgoCD app doesn't own this
+    # file. Without IgnoreExtraneous, the wrapper's selfHeal+prune deletes it.
+    # Documented interim pattern — see ROADMAP Phase 999.8.
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   hostnames:
     - project.neospend.com
