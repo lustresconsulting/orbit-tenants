@@ -4,15 +4,15 @@ metadata:
   name: t-neo-internals-1dc0-prod-openproject-project-neospend
   namespace: t-neo-internals-1dc0-prod
   labels:
-    app.kubernetes.io/instance: t-neo-internals-1dc0-prod
+    # NOTE: deliberately no `app.kubernetes.io/instance` label. That label is
+    # ArgoCD's default tracking key — adding it makes the tenant wrapper app
+    # (t-neo-internals-1dc0-prod) claim ownership, and because this HTTPRoute
+    # isn't in the charts/tenant-app Helm source, selfHeal+prune deletes it on
+    # the next sync. Matches the working pattern on staging-api.neospend.com
+    # and the oakknights custom-domain routes. See ROADMAP Phase 999.8.
     orbit.sh/component: openproject
     orbit.sh/tenant: neo-internals-1dc0-prod
     orbit.sh/custom-domain: "true"
-  annotations:
-    # Applied imperatively; the tenant wrapper ArgoCD app doesn't own this
-    # file. Without IgnoreExtraneous, the wrapper's selfHeal+prune deletes it.
-    # Documented interim pattern — see ROADMAP Phase 999.8.
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   hostnames:
     - project.neospend.com
