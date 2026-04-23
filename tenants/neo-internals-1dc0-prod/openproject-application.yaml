@@ -51,25 +51,30 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-        # root-level "resources" controls the web deployment (chart structure)
+        # root-level "resources" controls the web deployment (chart structure).
+        # Web runs Puma + full Rails stack; observed steady-state ~1.0 GiB with
+        # SMTP + collaborative editing enabled, and Rails boot spikes above
+        # that. 1Gi limit OOM-killed (seen 1036Mi evicted). 1.5Gi gives headroom.
         resources:
           requests:
             cpu: 250m
-            memory: 512Mi
+            memory: 768Mi
           limits:
             cpu: 1000m
-            memory: 1Gi
+            memory: 1536Mi
 
-        # workers.default controls the worker-default deployment
+        # workers.default controls the worker-default deployment.
+        # Workers load the full OpenProject Rails stack + Good Job runner; the
+        # chart default of 512Mi limit OOM-kills on boot. 1Gi matches web.
         workers:
           default:
             resources:
               requests:
                 cpu: 100m
-                memory: 256Mi
+                memory: 512Mi
               limits:
                 cpu: 500m
-                memory: 512Mi
+                memory: 1Gi
 
         hocuspocus:
           resources:
@@ -80,22 +85,40 @@ spec:
               cpu: 500m
               memory: 512Mi
 
+        # Platform uses Gateway API (HTTPRoute + orbit-gateway). The chart's
+        # classic Ingress doesn't render a spec.tls block and therefore serves
+        # no cert on :443 — disable it and route via openproject-httproute.yaml
+        # in this directory, matching every other tenant on Orbit.
         ingress:
-          enabled: true
-          ingressClassName: traefik
-          host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
-          tls:
-            enabled: true
-          annotations:
-            traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            cert-manager.io/cluster-issuer: letsencrypt-prod
+          enabled: false
 
+        # Secret values (SECRET_KEY_BASE, SMTP password) come from the
+        # tenant-secrets-backend Secret, which is auto-synced from Infisical
+        # (workspace neo-internals-1dc0-prod) by the operator-managed
+        # tenant-secrets-backend ExternalSecret via dataFrom.find wildcard.
         environment:
           OPENPROJECT_SECRET__KEY__BASE:
             valueFrom:
               secretKeyRef:
-                name: openproject-secret-key
-                key: secret_key_base
+                name: tenant-secrets-backend
+                key: OPENPROJECT_SECRET_KEY_BASE
+          # Timezone — app renders timestamps in CT per legacy deployment
+          TZ: America/Chicago
+          # Resend SMTP — mirrors legacy neolab config
+          OPENPROJECT_EMAIL__DELIVERY__METHOD: smtp
+          OPENPROJECT_EMAIL__FROM: noreply@neospend.com
+          OPENPROJECT_SMTP__ADDRESS: smtp.resend.com
+          OPENPROJECT_SMTP__PORT: "587"
+          OPENPROJECT_SMTP__DOMAIN: project.neospend.com
+          OPENPROJECT_SMTP__AUTHENTICATION: login
+          OPENPROJECT_SMTP__ENABLE__STARTTLS__AUTO: "true"
+          OPENPROJECT_SMTP__OPENSSL__VERIFY__MODE: peer
+          OPENPROJECT_SMTP__USER__NAME: resend
+          OPENPROJECT_SMTP__PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: tenant-secrets-backend
+                key: OPENPROJECT_SMTP__PASSWORD
 
   destination:
     server: https://kubernetes.default.svc
