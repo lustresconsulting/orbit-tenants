@@ -17,7 +17,11 @@ spec:
       values: |
         develop: true
         openproject:
-          host: openproject-neo-internals-1dc0-prod.orbit.lustres.dev
+          # Public vanity host. Internal host
+          # openproject-neo-internals-1dc0-prod.orbit.lustres.dev stays reachable
+          # via openproject-httproute.yaml for operator debugging, but
+          # system-generated URLs (mails, OAuth, asset paths) use the vanity.
+          host: project.neospend.com
           https: true
 
         postgresql:
