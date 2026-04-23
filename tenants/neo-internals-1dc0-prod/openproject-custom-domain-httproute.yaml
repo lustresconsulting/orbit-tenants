@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: t-neo-internals-1dc0-prod-openproject-project-neospend
+  namespace: t-neo-internals-1dc0-prod
+  labels:
+    app.kubernetes.io/instance: t-neo-internals-1dc0-prod
+    orbit.sh/component: openproject
+    orbit.sh/tenant: neo-internals-1dc0-prod
+    orbit.sh/custom-domain: "true"
+spec:
+  hostnames:
+    - project.neospend.com
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: orbit-gateway
+      namespace: orbit-system
+      sectionName: websecure-neospend-project
+  rules:
+    # Hocuspocus collaborative-editing websocket — mirrors openproject-httproute.yaml.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /hocuspocus
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: t-neo-internals-1dc0-prod-openproject-hocuspocus
+          port: 1234
+          weight: 1
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: t-neo-internals-1dc0-prod-openproject
+          port: 8080
+          weight: 1
