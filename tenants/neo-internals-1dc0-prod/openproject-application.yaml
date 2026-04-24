@@ -15,13 +15,24 @@ spec:
     targetRevision: "*"
     helm:
       values: |
-        develop: true
+        # Pin image to the version we migrated to (2026-04-23). Chart default
+        # currently matches, but the chart's rolling default is what bit us
+        # during the migration — freeze it here so a future chart bump can't
+        # silently upgrade the image underneath us.
+        image:
+          tag: "17.3.1-slim"
+
         openproject:
           # Public vanity host. Internal host
           # openproject-neo-internals-1dc0-prod.orbit.lustres.dev stays reachable
           # via openproject-httproute.yaml for operator debugging, but
           # system-generated URLs (mails, OAuth, asset paths) use the vanity.
           host: project.neospend.com
+          # NOTE: do NOT set `develop: true` at top level. The chart hard-codes
+          # OPENPROJECT_HTTPS=false whenever develop is truthy (see chart
+          # templates/secret_core.yaml), which breaks mail/OAuth/redirect URLs.
+          # develop also disables readOnlyRootFilesystem and /tmp emptyDir —
+          # both of which we want in prod.
           https: true
 
         postgresql:
