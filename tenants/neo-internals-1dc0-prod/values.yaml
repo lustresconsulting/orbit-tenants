@@ -50,7 +50,7 @@ tenant:
   resourcePrefix: t-neo-internals-1dc0-prod
   slug: neo-internals-1dc0-prod
 valkey:
-  enabled: false
+  enabled: true
   existingSecret: tenant-valkey-credentials
   existingSecretKey: password
   image:
