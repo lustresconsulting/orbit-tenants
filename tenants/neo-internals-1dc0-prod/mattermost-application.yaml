@@ -1,0 +1,173 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: t-neo-internals-1dc0-prod-mattermost
+  namespace: argocd
+  annotations:
+    # Sync AFTER OpenProject (wave 20) — staggers first-boot load on shared
+    # CNPG cluster t-neo-internals-1dc0-prod-pg and avoids two apps racing
+    # migrations on cold start.
+    argocd.argoproj.io/sync-wave: "21"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: t-neo-internals-1dc0-prod
+  source:
+    repoURL: https://helm.mattermost.com
+    chart: mattermost-team-edition
+    # Chart 6.6.83 = appVersion 10.11.2 (matches minor of source 10.11.10).
+    # Chart 6.6.96 ships appVersion 11.6.1 — chose NOT to cross major during
+    # migration. Upgrade to 6.6.96 as a separate change post-cutover.
+    targetRevision: "6.6.83"
+    helm:
+      values: |
+        # Pin image to exact source version to avoid silent drift from chart's
+        # rolling image.tag. Docker Hub confirms 10.11.10 tag exists.
+        image:
+          repository: mattermost/mattermost-team-edition
+          tag: "10.11.10"
+          imagePullPolicy: IfNotPresent
+
+        # Disable bundled MySQL — we use the tenant's CNPG (PostgreSQL 17).
+        mysql:
+          enabled: false
+
+        # Chart expects this block to render a `mattermost-dbsecret` Secret
+        # containing MM_CONFIG. The rendered value is LITERAL (Helm `tpl`
+        # evaluates the template but does NOT substitute $(VAR) at runtime),
+        # so we leave the password placeholder here and override MM_CONFIG
+        # via extraEnvVars below — last-declared env wins in kubelet.
+        externalDB:
+          enabled: true
+          externalDriverType: postgres
+          externalConnectionString: >-
+            tenant:placeholder-overridden-by-extraEnvVars@t-neo-internals-1dc0-prod-pg-rw:5432/mattermost?sslmode=disable&connect_timeout=10&binary_parameters=yes
+
+        # PVC sizing:
+        #   data: source /mattermost/data is 181M + room for future attachments.
+        #   plugins: source plugins dir is 193M + client/plugins 25M = ~220M.
+        #     Default 1Gi too tight — mattermost-ai plugin's model deps can be
+        #     50-80M per binary.
+        persistence:
+          data:
+            enabled: true
+            size: 10Gi
+            accessMode: ReadWriteOnce
+          plugins:
+            enabled: true
+            size: 2Gi
+            accessMode: ReadWriteOnce
+
+        # Chart's classic Ingress doesn't render a spec.tls block — we route
+        # via mattermost-httproute.yaml + mattermost-custom-domain-httproute.yaml
+        # in this directory, matching every other tenant on Orbit (Gateway API).
+        ingress:
+          enabled: false
+        route:
+          enabled: false
+
+        # Container config via env vars (MM reads MM_* vars as config overrides).
+        #
+        # ORDER MATTERS: $(VAR) expansion in kubelet only substitutes if VAR is
+        # declared BEFORE the consuming env in the container's env list. The
+        # chart appends extraEnvVars AFTER its own MM_CONFIG env, so our
+        # MM_CONFIG here duplicates the chart's and WINS (last value wins for
+        # duplicate env names at runtime). DB_PASSWORD must come first in this
+        # array so subsequent $(DB_PASSWORD) references resolve.
+        extraEnvVars:
+          # Pull the tenant DB password from the operator-managed
+          # tenant-db-credentials Secret. Value never leaves the pod.
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: tenant-db-credentials
+                key: password
+
+          # Override the chart-rendered MM_CONFIG. Same DSN shape as OpenProject
+          # uses (postgres, sslmode=disable for in-cluster, binary_parameters
+          # required by MM's pgx driver for COPY support).
+          - name: MM_CONFIG
+            value: "postgres://tenant:$(DB_PASSWORD)@t-neo-internals-1dc0-prod-pg-rw:5432/mattermost?sslmode=disable&connect_timeout=10&binary_parameters=yes"
+
+          # Defense in depth: MM honors MM_SQLSETTINGS_DATASOURCE as a config
+          # override regardless of what's in the Config table. If Config table
+          # ever drifts from MM_CONFIG (e.g. post config migrate from source),
+          # this keeps data reads pointing at the right DB.
+          - name: MM_SQLSETTINGS_DRIVERNAME
+            value: "postgres"
+          - name: MM_SQLSETTINGS_DATASOURCE
+            value: "postgres://tenant:$(DB_PASSWORD)@t-neo-internals-1dc0-prod-pg-rw:5432/mattermost?sslmode=disable&connect_timeout=10&binary_parameters=yes"
+
+          # Public URL — source config.json has this too but env overrides DB.
+          - name: MM_SERVICESETTINGS_SITEURL
+            value: "https://chat.neospend.com"
+
+          # Enables `mmctl` to connect over a unix socket at /var/tmp/mattermost_local.socket
+          # for post-migration plugin disable (com.mattermost.calls).
+          - name: MM_SERVICESETTINGS_ENABLELOCALMODE
+            value: "true"
+
+          # Source sets this to keep bleve search indexes on the data volume;
+          # mirroring here avoids a search-index rebuild churn on first boot.
+          - name: MM_BLEVESETTINGS_INDEXDIR
+            value: "/mattermost/bleve-indexes"
+
+          # SMTP via Resend (same provider as OpenProject, different key).
+          # MATTERMOST_SMTP__PASSWORD must exist in Infisical workspace
+          # neo-internals-1dc0-prod before first pod boot — see Step C of the
+          # migration checklist.
+          - name: MM_EMAILSETTINGS_SMTPSERVER
+            value: "smtp.resend.com"
+          - name: MM_EMAILSETTINGS_SMTPPORT
+            value: "587"
+          - name: MM_EMAILSETTINGS_CONNECTIONSECURITY
+            value: "STARTTLS"
+          - name: MM_EMAILSETTINGS_SMTPUSERNAME
+            value: "resend"
+          - name: MM_EMAILSETTINGS_SMTPPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: tenant-secrets-backend
+                key: MATTERMOST_SMTP__PASSWORD
+          - name: MM_EMAILSETTINGS_FEEDBACKEMAIL
+            value: "noreply@neospend.com"
+          - name: MM_EMAILSETTINGS_REPLYTOADDRESS
+            value: "noreply@neospend.com"
+          - name: MM_EMAILSETTINGS_FEEDBACKNAME
+            value: "Neospend Chat"
+          - name: MM_EMAILSETTINGS_FEEDBACKORGANIZATION
+            value: ""
+          - name: MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS
+            value: "true"
+          - name: MM_EMAILSETTINGS_ENABLESMTPAUTH
+            value: "true"
+
+          # Timezone — match legacy deployment for timestamp display.
+          - name: TZ
+            value: "America/Chicago"
+
+        # Resource sizing for a single-pod MM with ~10-50 users:
+        #   steady-state ~200-400Mi, peaks ~800Mi during search indexing.
+        #   1.5Gi limit gives headroom without starving other tenant workloads.
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1536Mi
+
+        # Probe tuning: MM 10.11.x takes ~60-90s to initialize Bleve indexes on
+        # first boot. Chart's default startupProbe (30 × 10s = 300s) covers that;
+        # keep defaults unless we observe pod cycling.
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: t-neo-internals-1dc0-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true

@@ -1,0 +1,36 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: t-neo-internals-1dc0-prod-mattermost
+  namespace: t-neo-internals-1dc0-prod
+  labels:
+    # NOTE: deliberately no `app.kubernetes.io/instance` label. That label is
+    # ArgoCD's default tracking key — adding it makes the tenant wrapper app
+    # (t-neo-internals-1dc0-prod) claim ownership, and because this HTTPRoute
+    # isn't in the charts/tenant-app Helm source, selfHeal+prune deletes it on
+    # the next sync. Same rationale as openproject-httproute.yaml.
+    orbit.sh/component: mattermost
+    orbit.sh/tenant: neo-internals-1dc0-prod
+spec:
+  hostnames:
+    - mattermost-neo-internals-1dc0-prod.orbit.lustres.dev
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: orbit-gateway
+      namespace: orbit-system
+      sectionName: websecure
+  rules:
+    # Mattermost WebSockets at /api/v4/websocket — Traefik v3 Gateway API passes
+    # the Upgrade/Connection headers through automatically, no separate rule
+    # needed. Single catch-all rule is sufficient.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: mattermost-team-edition
+          port: 8065
+          weight: 1

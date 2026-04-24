@@ -1,0 +1,42 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: t-neo-internals-1dc0-prod-mattermost-chat-neospend
+  namespace: t-neo-internals-1dc0-prod
+  annotations:
+    # ArgoCD keeps trying to prune extraneous fields on cross-namespace routes
+    # (status + listener-set metadata added by Traefik). IgnoreExtraneous tells
+    # the wrapper app to stop comparing those — matches the pattern from
+    # commit 817ccbf for openproject-custom-domain-httproute.yaml.
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    # NOTE: deliberately no `app.kubernetes.io/instance` label.
+    # See mattermost-httproute.yaml for rationale.
+    orbit.sh/component: mattermost
+    orbit.sh/tenant: neo-internals-1dc0-prod
+    orbit.sh/custom-domain: "true"
+spec:
+  hostnames:
+    - chat.neospend.com
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: orbit-gateway
+      namespace: orbit-system
+      # Listener provisioned by orbit repo commit on 2026-04-24:
+      # deploy/platform/neospend-chat-gateway-listener.yaml with cert
+      # neospend-chat-cert (CN=chat.neospend.com, Ready=True).
+      sectionName: websecure-neospend-chat
+  rules:
+    # Single rule catches WS + HTTP; Traefik v3 Gateway API handles the
+    # Upgrade/Connection headers for /api/v4/websocket natively.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: mattermost-team-edition
+          port: 8065
+          weight: 1
