@@ -50,12 +50,4 @@ tenant:
   resourcePrefix: t-neo-internals-1dc0-prod
   slug: neo-internals-1dc0-prod
 valkey:
-  enabled: true
-  existingSecret: tenant-valkey-credentials
-  existingSecretKey: password
-  image:
-    repository: valkey/valkey
-    tag: 7.2-alpine
-  storage:
-    size: 10Gi
-    storageClass: local-path
+  enabled: false
