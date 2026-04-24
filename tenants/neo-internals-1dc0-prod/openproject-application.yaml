@@ -15,6 +15,19 @@ spec:
     targetRevision: "*"
     helm:
       values: |
+        # develop: true is required for OpenProject 17 on this chart:
+        #   1. disables readOnlyRootFilesystem (Rails boots fine either way
+        #      locally but MiniMagick 5.3.1's Dir.tmpdir check rejects our
+        #      other option — the emptyDir /tmp mount — for not having the
+        #      sticky bit)
+        #   2. skips the tmp-emptyDir volumes (which Ruby rejects for the
+        #      same reason — `rwxrws-rwx` not `rwxrwxrwt`)
+        # The downside: chart's secret_core.yaml hard-codes
+        # OPENPROJECT_HTTPS=false whenever develop is truthy. We override
+        # that below in the environment: block; the extra-env Secret loads
+        # AFTER core in envFrom, so last-wins gives us HTTPS=true.
+        develop: true
+
         # Pin image to the version we migrated to (2026-04-23). Chart default
         # currently matches, but the chart's rolling default is what bit us
         # during the migration — freeze it here so a future chart bump can't
@@ -28,11 +41,6 @@ spec:
           # via openproject-httproute.yaml for operator debugging, but
           # system-generated URLs (mails, OAuth, asset paths) use the vanity.
           host: project.neospend.com
-          # NOTE: do NOT set `develop: true` at top level. The chart hard-codes
-          # OPENPROJECT_HTTPS=false whenever develop is truthy (see chart
-          # templates/secret_core.yaml), which breaks mail/OAuth/redirect URLs.
-          # develop also disables readOnlyRootFilesystem and /tmp emptyDir —
-          # both of which we want in prod.
           https: true
 
         postgresql:
@@ -112,6 +120,10 @@ spec:
         # (workspace neo-internals-1dc0-prod) by the operator-managed
         # tenant-secrets-backend ExternalSecret via dataFrom.find wildcard.
         environment:
+          # Override the chart's develop-forced HTTPS=false (see top-level
+          # develop: true comment). This Secret loads AFTER *-openproject-core
+          # in envFrom, so last-wins gives us HTTPS=true.
+          OPENPROJECT_HTTPS: "true"
           OPENPROJECT_SECRET__KEY__BASE:
             valueFrom:
               secretKeyRef:
