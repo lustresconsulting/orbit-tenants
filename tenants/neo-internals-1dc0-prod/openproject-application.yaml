@@ -77,14 +77,16 @@ spec:
         # root-level "resources" controls the web deployment (chart structure).
         # Web runs Puma + full Rails stack; observed steady-state ~1.0 GiB with
         # SMTP + collaborative editing enabled, and Rails boot spikes above
-        # that. 1Gi limit OOM-killed (seen 1036Mi evicted). 1.5Gi gives headroom.
+        # that. 1.5Gi limit OOM-killed (seen 1036Mi evicted at peak); 2Gi
+        # accommodates Rails boot + SMTP + collaborative editing peaks
+        # observed in v1.13 capacity review (STAB-01, Phase 47).
         resources:
           requests:
             cpu: 250m
-            memory: 768Mi
+            memory: 1Gi
           limits:
             cpu: 1000m
-            memory: 1536Mi
+            memory: 2Gi
 
         # workers.default controls the worker-default deployment.
         # Workers load the full OpenProject Rails stack + Good Job runner; the
