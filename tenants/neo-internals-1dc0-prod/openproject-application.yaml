@@ -75,28 +75,42 @@ spec:
               memory: 512Mi
 
         # root-level "resources" controls the web deployment (chart structure).
-        # Web runs Puma + full Rails stack; observed steady-state ~1.0 GiB with
+        # Web runs Puma + full Rails stack; observed steady-state ~1.3 GiB with
         # SMTP + collaborative editing enabled, and Rails boot spikes above
-        # that. 1.5Gi limit OOM-killed (seen 1036Mi evicted at peak); 2Gi
-        # accommodates Rails boot + SMTP + collaborative editing peaks
-        # observed in v1.13 capacity review (STAB-01, Phase 47).
+        # that.
+        #
+        # 47-01 (2026-04-25) bumped limit 1.5Gi -> 2Gi to stop OOMKills, but
+        # left request at 1Gi. ~1h post-bump kubelet evicted the pod anyway
+        # because the 1.3 GiB working set was above the 1Gi request and node-2
+        # hit its 1500Mi soft eviction threshold (Phase 47 STAB-01 follow-up
+        # 2026-04-25T03:13Z).
+        #
+        # Setting request == limit (2Gi) gives the pod Guaranteed QoS class,
+        # which kubelet's eviction selector treats as last-to-go. Working set
+        # 1.3 GiB now sits comfortably under request, so the pod is no longer
+        # an eviction candidate when other pods drift the node into pressure.
         resources:
           requests:
             cpu: 250m
-            memory: 1Gi
+            memory: 2Gi
           limits:
             cpu: 1000m
             memory: 2Gi
 
         # workers.default controls the worker-default deployment.
         # Workers load the full OpenProject Rails stack + Good Job runner; the
-        # chart default of 512Mi limit OOM-kills on boot. 1Gi matches web.
+        # chart default of 512Mi limit OOM-kills on boot.
+        #
+        # 2026-04-25 STAB-01 follow-up: worker working set was ~600 MiB with
+        # 512 MiB request, making it the next eviction candidate after web
+        # was lifted out. Bumping request to 1Gi (== limit) gives Guaranteed
+        # QoS, same reasoning as web above.
         workers:
           default:
             resources:
               requests:
                 cpu: 100m
-                memory: 512Mi
+                memory: 1Gi
               limits:
                 cpu: 500m
                 memory: 1Gi
