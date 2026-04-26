@@ -1,0 +1,5 @@
+components:
+  backend:
+    image:
+      repository: ghcr.io/lustresconsulting/orbit-tenant-neospendapp-a57e-prod-backend
+      tag: 89a19cecf26eb6d71b8b63a3349e5f8b01f6424d
