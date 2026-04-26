@@ -50,8 +50,10 @@ spec:
                 name: tenant-secrets-{{ $name }}
                 optional: true
           {{- end }}
+          {{- if $comp.resources }}
           resources:
             {{- toYaml $comp.resources | nindent 12 }}
+          {{- end }}
           {{- if and $comp.livenessProbe (ne $comp.type "worker") }}
           livenessProbe:
             {{- toYaml $comp.livenessProbe | nindent 12 }}
